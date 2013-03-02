@@ -1,0 +1,10 @@
+body { padding-top: 60px; padding-bottom: 40px; }
+article { padding: 0; }
+
+
+.sidebar-nav { padding: 9px 0; background-color: #ffffff; }
+.sidebar-nav { padding-top: 0px; }
+.sidebar-nav .nav-header { background-color: #eeeeee; border-top: 1px solid #dddddd; border-bottom: 1px solid #dddddd; }
+.sidebar-nav .nav-header:first-child { border-top: none; }
+.sidebar-nav a span { padding-left: 10px; font-weight: normal; color: #999999; }
+h5 { font-weight: normal; color: #999999; }

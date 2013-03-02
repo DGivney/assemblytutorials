@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>NASM Assembly Tutorials - asmtutor.com</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link href="./assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./assets/stylesheet.css" rel="stylesheet">
+    <link href="./assets/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet">
+
+	<script src="./assets/syntax-highlighter/scripts/shCore.js"></script>
+	<script src="./assets/syntax-highlighter/scripts/shBrushAsm.js"></script>
+	<link href="./assets/syntax-highlighter/styles/shCoreDefault.css" rel="stylesheet">
+
+	<script type="text/javascript">SyntaxHighlighter.all();</script>
+    
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
+    <link rel="shortcut icon" href="../assets/ico/favicon.png">
+</head>
+
+<body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="container-fluid">
+                <span class="brand">NASM Assembly Tutorials - asmtutor.com</span>
+                <div class="nav-collapse collapse">
+                    <p class="navbar-text pull-right">
+                        <a class="navbar-link" href="#top">Top</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>    
+
+    <div class="container-fluid">
+        <div class="row-fluid">
+            
+            <div class="span3">
+                <div class="well sidebar-nav">
+                    <ul class="nav nav-list">
+                        <li class="nav-header">Lessons</li>
+                        <li><a href="#lesson1">Lesson 1 <span>Hello, world!</span></a></li>
+                        <li><a href="#lesson2">Lesson 2 <span>Proper program exit</span></a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="span9 lessons">
+                
+                <div class="hero-unit">
+                    <h2>Learn Assembly</h2>
+                    <p>This project was put together to teach myself NASM 64bit assembly language on linux. The tutorials are designed to flow on from each other adding functionality at each stage.</p>
+                    <p><a href="https://github.com/DGivney/asmtutor" class="btn btn-primary btn" target="_blank">Github Project &raquo;</a></p>
+                </div>
+                  
+                <div class="row-fluid">
+                    <div class="span4">
+                        <h2>Lesson 1</h2>
+                        <h5>The obligatory 'Hello, world!'</h5>
+                        <p>Introduction to the Linux System Call Table.  In this lesson we use software interrupts to request system functions from the kernel in order to print out 'Hello World!' to the console.</p>
+                        <p><a class="btn" href="#lesson1">View lesson &raquo;</a></p>
+                    </div>
+                    <div class="span4">
+                        <h2>Lesson 2</h2>
+                        <h5>Proper program exit</h5>
+                        <p>A very brief lesson about memory addresses, sequential code execution and how to properly terminate a program without errors.</p>
+                        <p><a class="btn" href="#lesson2">View details &raquo;</a></p>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="row-fluid" id="lesson1">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 1</h2>
+                            <h4>Hello, world!</h4>
+                        </header>
+
+                            <h5>First, some background</h5>
+
+                            <p>Assembly language is bare-bones. The only interface a programmer has above the actual hardware is the kernel itself. In order to build useful programs in assembly we need to use the linux system calls provided by the kernel. These system calls are a library built into the operating system to provide functions such as reading input from a keyboard and writing output to the screen.</p>
+
+                            <p>When you invoke a system call the kernel will immediately suspend execution of your program.  It will then contact the necessary drivers needed to perform the task you requested on the hardware and then return control back to your program.</p>
+
+                            <p>
+                                <span class="label label-info">Note:</span>
+                                Drivers are called <i>drivers</i> because the kernel literally uses them to drive the hardware.
+                            </p>
+                        
+                            <p>We can accomplish this all in assembly by loading EAX with the function number (operation code OPCODE) we want to execute and filling the remaining registers with the arguments we want to pass to the system call. A software interrupt is requested with the INT instruction and the kernel takes over and calls the function from the library with our arguments. Simple.</p>
+
+                            <p>For example requesting an interrupt when EAX=1 will call sys_exit() and requesting an interrupt when EAX=4 will call sys_write() instead. EBX, ECX & EDX will be passed as arguments if the function requires them. <a href="http://docs.cs.up.ac.za/programming/asm/derick_tut/syscalls.html" target="_blank">Click here to view an example of a Linux System Call Table and its corresponding OPCODES.</a></p>
+
+                            <h5>Writing our program</h5>
+
+                            <p>Firstly we create a variable 'msg' in our .data section and assign it the string we want to output in this case 'Hello, world!'. In our .text section we tell the kernel where to begin execution by providing it with a global label _start: to denote the programs entry point.</p>
+
+                            <p>We will be using the system call sys_write to output our message to the console window.  This function is assigned OPCODE 1 in the Linux System Call Table.  The function also takes 3 arguments which are sequentially loaded into EDX, ECX and EBX before requesting a software interrupt which will perform the task.</p>
+
+                            <p>The arguments passed are as follows:
+                                <ul>
+                                    <li> EDX will be loaded with the length (in bytes) of the our string.</li>
+                                    <li> ECX will be loaded with the address of our variable created in the .data section.</li>
+                                    <li> EBX will be loaded with the file we want to write to – in this case STDOUT.</li>
+                                </ul>
+                                The datatype and meaning of the arguments passed can be found in the function's definition.
+                            </p>
+
+                            <p>We compile, link and run the program using the commands below.</p>
+
+                        <div class="snippet">
+                            <span class="filename">helloworld.asm</span>
+                            <pre class="brush: asm;">
+                            ; Hello World Program - asmtutor.com
+                            ; Compile with: nasm -f elf helloworld.asm
+                            ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 helloworld.o -o helloworld
+                            ; Run with: ./helloworld
+
+                            SECTION .data
+                            msg     db      'Hello World!', 0Ah     ; assign msg variable with your message string
+
+                            SECTION .text
+                            global  _start
+
+                            _start: 
+
+                                mov     edx, 13     ; number of bytes to write - one for each letter plus 0Ah (line feed character)
+                                mov     ecx, msg    ; move the memory address of our message string into ecx
+                                mov     ebx, 1      ; write to the STDOUT file
+                                mov     eax, 4      ; invoke SYS_WRITE (kernel opcode 4)
+                                int     80h
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf helloworld.asm</span>
+                                    <span>~$ ld -m elf_i386 helloworld.o -o helloworld</span>
+                                    <span>~$ ./helloworld</span>
+                                    <span>Hello World!</span>
+                                    <span>Segmentation fault</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p>
+                            <span class="label label-important">Error:</span>
+                            Segmentation fault
+                        </p>
+                        
+                    </article>
+                </div>
+
+                <hr>
+
+                <div class="row-fluid" id="lesson2">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 2</h2>
+                            <h4>Proper program exit</h4>
+                        </header>
+
+                        <h5>Some more background</h5>
+
+                        <p>After successfully learning now to execute a system call in Lesson 1 we now need to learn about one of the most important system calls in the kernel, sys_exit.</p>
+
+                        <p>Notice how after our 'Hello, world!' program ran we got a Segmentation fault? Well, computer programs can be thought of as a long strip of instructions that are loaded into memory and divided up into sections (or segments). This general pool of memory is shared between all programs and can be used to store variables, instructions, other programs or anything really. Each segment is given an address so that information stored in that section can be found later.</p>
+
+                        <p>To execute a program that is loaded in memory, we use the global label _start: to tell the operating system where in memory our program can be found and executed.  Memory is then accessed sequentially following the program logic which determines the next address to be accessed. The kernel jumps to that address in memory and executes it.</p>
+
+                        <p>It's important to tell the operating system exactly where it should begin execution and where it should stop. In Lesson 1 we didn't tell the kernel where to stop execution. So, after we called sys_write the program continued sequentially executing the next address in memory, which could have been anything. We don't know what the kernel tried to execute but it caused it to choke and terminate the process for us instead - leaving us the error message of 'Segmentation fault'.  Calling sys_exit at the end of all our programs will mean the kernel knows exactly when to terminate the process and return memory back to the general pool thus avoiding an error.</p>
+
+                        <h5>Writing our program</h5>
+
+                        <p>Sys_exit has a simple function definition.  In the Linux System Call Table it is allocated OPCODE 1 and is passed a single argument through EBX.</p>
+
+                        <p>In order to execute this function all we need to do is:
+                            <ul>
+                                <li>Load EBX with 0 to pass zero to the function meaning 'zero errors'.</li>
+                                <li>Load EAX with 1 to call sys_exit.</li>
+                                <li>Then request an interrupt on libc using INT 80h.</li>
+                            </ul>
+                        </p>
+
+                        <p>We then compile, link and run it again.</p>
+
+                        <p>
+                            <span class="label label-info">Note:</span>
+                            Only new code added in each lesson will be commented.
+                        </p>
+                        
+                        <div class="snippet">
+                            <span class="filename">helloworld.asm</span>
+                            <pre class="brush: asm;">
+                            ; Hello World Program - asmtutor.com
+                            ; Compile with: nasm -f elf helloworld.asm
+                            ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 helloworld.o -o helloworld
+                            ; Run with: ./helloworld
+
+                            SECTION .data
+                            msg     db      'Hello World!', 0Ah
+
+                            SECTION .text
+                            global  _start
+
+                            _start: 
+
+                                mov     edx, 13
+                                mov     ecx, msg
+                                mov     ebx, 1
+                                mov     eax, 4
+                                int     80h
+
+                                mov     ebx, 0      ; return 0 status on exit - 'No Errors'
+                                mov     eax, 1      ; invoke SYS_EXIT (kernel opcode 1)
+                                int     80h
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf helloworld.asm</span>
+                                    <span>~$ ld -m elf_i386 helloworld.o -o helloworld</span>
+                                    <span>~$ ./helloworld</span>
+                                    <span>Hello World!</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </article>
+                </div>
+                                
+            </div>
+        </div>
+
+        <hr>
+
+        <footer>
+            <p>Learn assembly language at <a href="http://asmtutor.com">http://asmtutor.com</a></p>
+        </footer>
+
+    </div>
+    
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script src="./assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="./assets/script.js"></script>
+    
+  </body>
+</html>
+

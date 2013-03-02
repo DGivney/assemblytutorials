@@ -1,0 +1,36 @@
+/* main styles */
+body { padding-top: 60px; padding-bottom: 40px; }
+article { padding: 0; }
+h5 { font-weight: normal; color: #999999; }
+.brand:hover { color: #999999 !important; }
+p { margin: 0 0 15px; }
+span.register-name { text-transform: uppercase; font-weight: 500; color: #808080; }
+span.instruction-name { text-transform: uppercase; font-weight: 500; color: #808080; }
+span.function-name { text-transform: lowercase; font-weight: 500; color: #808080; font-style: italic; }
+
+/* sidebar styles */
+.sidebar-nav { padding: 9px 0; background-color: #ffffff; }
+.sidebar-nav { padding-top: 0px; }
+.sidebar-nav .nav-header { background-color: #eeeeee; border-top: 1px solid #dddddd; border-bottom: 1px solid #dddddd; }
+.sidebar-nav .nav-header:first-child { border-top: none; }
+.sidebar-nav a span { padding-left: 10px; font-weight: normal; color: #999999; display: inline; }
+
+/* article styles */
+.lessons hr { margin: 40px 0 0px 0; }
+.lessons article { padding: 40px 0 0 0; }
+.lessons article h4 { color: #999999; font-weight: normal; }
+.lessons article h5 { color: #006699; font-weight: bold; margin-top: 25px; }
+.lessons article h5:before { content: "\05F"; }
+.lessons article h5:after { content: "\03A"; }
+
+/* snippet styles */
+div.snippet { margin: 20px 0px; }
+div.snippet div.syntaxhighlighter { font-size: .90em !important; margin: 0 !important; padding: 9px 0; border: 1px solid #eeeeee; -webkit-border-top-right-radius: 6px; -moz-border-radius-topright: 6px; border-top-right-radius: 6px; }
+div.snippet span.filename { color: #999999; padding: 3px 8px; background-color: #eeeeee; border-right: 1px solid #dddddd; border-left: 1px solid #dddddd; border-top: 1px solid #dddddd; -webkit-border-top-left-radius: 6px; -webkit-border-top-right-radius: 6px; -moz-border-radius-topleft: 6px; -moz-border-radius-topright: 6px; border-top-left-radius: 6px; border-top-right-radius: 6px; }
+div.snippet div.output { font-size: 1em !important; background-color: #eeeeee; border: 1px solid #dddddd; width: 100% !important; -webkit-border-bottom-right-radius: 6px; -webkit-border-bottom-left-radius: 6px; -moz-border-radius-bottomright: 6px; -moz-border-radius-bottomleft: 6px; border-bottom-right-radius: 6px; border-bottom-left-radius: 6px; }
+div.snippet div.output .inner { padding: 8px 15px; color: #999999; }
+div.snippet div.output .inner span { display: block; clear: both; line-height: 16px; }
+
+/* fix for bootstrap to play nice with syntaxhighlighter */
+.syntaxhighlighter table td.code .container:before,
+.syntaxhighlighter table td.code .container:after { display: none; }
