@@ -109,7 +109,7 @@
 
                             <p>Firstly we create a variable 'msg' in our .data section and assign it the string we want to output in this case 'Hello, world!'. In our .text section we tell the kernel where to begin execution by providing it with a global label _start: to denote the programs entry point.</p>
 
-                            <p>We will be using the system call sys_write to output our message to the console window.  This function is assigned OPCODE 1 in the Linux System Call Table.  The function also takes 3 arguments which are sequentially loaded into EDX, ECX and EBX before requesting a software interrupt which will perform the task.</p>
+                            <p>We will be using the system call sys_write to output our message to the console window.  This function is assigned OPCODE 4 in the Linux System Call Table.  The function also takes 3 arguments which are sequentially loaded into EDX, ECX and EBX before requesting a software interrupt which will perform the task.</p>
 
                             <p>The arguments passed are as follows:
                                 <ul>
