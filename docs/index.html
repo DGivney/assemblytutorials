@@ -297,7 +297,7 @@
                                 
                             finished:
                                 sub     eax, ebx        ; subtract the address in EBX from the address in EAX
-                                                        ; remember both registers started pointing to the same address (see line 16)
+                                                        ; remember both registers started pointing to the same address (see line 15)
                                                         ; but EAX has been incremented one byte for each character in the message string
                                                         ; when you subtract one memory address from another of the same type
                                                         ; the result is number of segments between them - in this case the number of bytes
