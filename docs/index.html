@@ -54,6 +54,7 @@
                         <li class="nav-header">Lessons</li>
                         <li><a href="#lesson1">Lesson 1 <span>Hello, world!</span></a></li>
                         <li><a href="#lesson2">Lesson 2 <span>Proper program exit</span></a></li>
+                        <li><a href="#lesson3">Lesson 3 <span>Calculate string length</span></a></li>
                     </ul>
                 </div>
             </div>
@@ -78,6 +79,12 @@
                         <h5>Proper program exit</h5>
                         <p>A very brief lesson about memory addresses, sequential code execution and how to properly terminate a program without errors.</p>
                         <p><a class="btn" href="#lesson2">View details &raquo;</a></p>
+                    </div>
+                    <div class="span4">
+                        <h2>Lesson 3</h2>
+                        <h5>Calculate string length</h5>
+                        <p>What if we wanted to output something that we don't know the length of? Like user input? Learn about loops, labels and pointer arithmic.</p>
+                        <p><a class="btn" href="#lesson3">View details &raquo;</a></p>
                     </div>
                 </div>
                 
@@ -233,6 +240,84 @@
                                     <span>~$ ld -m elf_i386 helloworld.o -o helloworld</span>
                                     <span>~$ ./helloworld</span>
                                     <span>Hello World!</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </article>
+                </div>
+                
+                <hr>
+
+                <div class="row-fluid" id="lesson3">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 3</h2>
+                            <h4>Calculate string length</h4>
+                        </header>
+
+                        <h5>Firstly, some background</h5>
+
+                        <p>Why do we need to calculate the length of a string?</p>
+
+                        <p>Well sys_write requires that we pass it a pointer to the string we want to output in memory and the length in bytes we want to print out.  If we were to modify our message string we would have to update the length in bytes that we pass to sys_write as well, otherwise it will not print correctly. </p>
+
+                        <p>You can see what I mean using the program in Lesson 2.  Modify the message string to say 'Hello, brave new world!' then compile, link and run the new program.  The output will be 'Hello, brave ' (the first 13 characters) because we are still only passing 13 bytes to sys_write as its length.  It will be particularly necessary when we want to print out user input.  As we won't know the length of the data when we compile our program, we will need a way to calculate the length at runtime in order to successfully print it out.</p>
+
+                        <h5>Writing our program</h5>
+
+                        <p>To calculate the length of the string we will use a technique called pointer arithmetic.  Two registers are initialised pointing to the same address in memory.  One register (in this case EAX) will be incremented forward one byte for each character in the output string until we reach the end of the string.  The original pointer will then be subtracted from EAX.  This is effectively like subtraction between two arrays and the result yields the number of elements between the two addresses. This result is then passed to sys_write replacing our hard coded count.</p>
+
+                        <p>The CMP instruction compares the left hand side against the right hand side and sets a number of flags that are used for program flow.  The flag we're checking is the ZF or Zero Flag.  When the byte that EAX points to is equal to zero the ZF flag is set.  We then use the JZ instruction to jump, if the ZF flag is set, to the point in our program labeled 'finished'. This is to break out of the nextchar loop and continue executing the rest of the program.</p>
+                                                
+                        <div class="snippet">
+                            <span class="filename">helloworld-len.asm</span>
+                            <pre class="brush: asm;">
+                            ; Hello World Program (Calculating string length)
+                            ; Compile with: nasm -f elf helloworld-len.asm
+                            ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 helloworld-len.o -o helloworld-len
+                            ; Run with: ./helloworld-len
+
+                            SECTION .data
+                            msg     db      'Hello, brave new world!', 0AH
+
+                            SECTION .text
+                            global  _start
+                                
+                            _start: 
+
+                                mov     ebx, msg        ; move the address of our message string into EBX
+                                mov     eax, ebx        ; move the address in EBX into EAX as well (Both now point to the same segment in memory)
+                                
+                            nextchar:
+                                cmp     byte [eax], 0   ; compare the byte pointed to by EAX at this address against zero (Zero is an end of string delimiter)
+                                jz      finished        ; jump (if the zero flagged has been set) to the point in the code labeled 'finished'
+                                inc     eax             ; increment the address in EAX by one byte (if the zero flagged has NOT been set)
+                                jmp     nextchar        ; jump to the point in the code labeled 'nextchar'
+                                
+                            finished:
+                                sub     eax, ebx        ; subtract the address in EBX from the address in EAX
+                                                        ; remember both registers started pointing to the same address (see line 16)
+                                                        ; but EAX has been incremented one byte for each character in the message string
+                                                        ; when you subtract one memory address from another of the same type
+                                                        ; the result is number of segments between them - in this case the number of bytes
+                                
+                                mov     edx, eax        ; EAX now equals the number of bytes in our string
+                                mov     ecx, msg        ; the rest of the code should be familiar now
+                                mov     ebx, 1
+                                mov     eax, 4
+                                int     80h
+
+                                mov     ebx, 0      
+                                mov     eax, 1      
+                                int     80h
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf helloworld-len.asm</span>
+                                    <span>~$ ld -m elf_i386 helloworld-len.o -o helloworld-len</span>
+                                    <span>~$ ./helloworld-len</span>
+                                    <span>Hello, brave new world!</span>
                                 </div>
                             </div>
                         </div>
