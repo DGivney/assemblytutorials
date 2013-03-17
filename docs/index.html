@@ -55,6 +55,9 @@
                         <li><a href="#lesson1">Lesson 1 <span>Hello, world!</span></a></li>
                         <li><a href="#lesson2">Lesson 2 <span>Proper program exit</span></a></li>
                         <li><a href="#lesson3">Lesson 3 <span>Calculate string length</span></a></li>
+                        <li><a href="#lesson4">Lesson 4 <span>Subroutines</span></a></li>
+                        <li><a href="#lesson5">Lesson 5 <span>External include files</span></a></li>
+                        <li><a href="#lesson6">Lesson 6 <span>NUll terminating bytes</span></a></li>
                     </ul>
                 </div>
             </div>
@@ -87,7 +90,28 @@
                         <p><a class="btn" href="#lesson3">View details &raquo;</a></p>
                     </div>
                 </div>
-                
+
+                <div class="row-fluid">
+                    <div class="span4">
+                        <h2>Lesson 4</h2>
+                        <h5>Subroutines</h5>
+                        <p>Introduction to the stack and how to write clean, reusable code in assembly.</p>
+                        <p><a class="btn" href="#lesson4">View lesson &raquo;</a></p>
+                    </div>
+                    <div class="span4">
+                        <h2>Lesson 5</h2>
+                        <h5>External include files</h5>
+                        <p>To further simplify our code we can move our subroutines into an external include file.</p>
+                        <p><a class="btn" href="#lesson5">View details &raquo;</a></p>
+                    </div>
+                    <div class="span4">
+                        <h2>Lesson 6</h2>
+                        <h5>NULL terminating bytes</h5>
+                        <p>A quick lesson on how memory is handled. This lesson also fixes the duplication bug we added in lesson 4.</p>
+                        <p><a class="btn" href="#lesson6">View details &raquo;</a></p>
+                    </div>
+                </div>
+                                
                 <hr>
                 
                 <div class="row-fluid" id="lesson1">
@@ -324,7 +348,271 @@
 
                     </article>
                 </div>
+
+                <hr>
+
+                <div class="row-fluid" id="lesson4">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 4</h2>
+                            <h4>Subroutines</h4>
+                        </header>
+
+                        <h5>Introduction to subroutines</h5>
+
+                        <p>Subroutines are functions.  They are reusable pieces of code that can be called by your program to perform various repeatable tasks.  Subroutines are declared using labels just like we've used before (eg. _start:) however we don't use the JMP instruction to get to them - instead we use an new instruction CALL. We also don't use the JMP instruction to return to our program after we have run the function.  To return to our program from a subroutine we use the instruction RET instead.</p>
+
+                        <h5>Why don't we JMP to subroutines?</h5>
+
+                        <p>The great thing about writing a subroutine is that we can reuse it.  If we want to be able to use the subroutine from anywhere in the code we would have to write some logic to determine where in the code we had jumped from and where we should jump back to.  This would litter our code with unwanted labels.  If we use CALL and RET however, assembly handles this problem for us using something called the stack.</p>
+
+                        <h5>Introduction to the stack</h5>
+
+                        <p>The stack is a special type of memory.  It's the same type of memory that we've used before however it's special in how it is used by our program.  The stack is what is call <strong>Last In First Out</strong> memory (LIFO).  You can think of the stack like a stack of plates in your kitchen.  The last plate you put on the stack is also the first plate you will take off the stack next time you use a plate.</p>
+
+                        <p>The stack in assembly is not storing plates though, its storing values.  You can store a lot of things on the stack such as variables, addresses or other programs.  We need to use the stack when we call subroutines to temporary store values that will be restored later.</p>
+
+                        <p>Any register that your function needs to use should have it's current value put on the stack for safe keeping using the PUSH instruction.  Then after the function has finished it's logic, these registers can have their original values restored using the POP instruction.  This means that any values in the registers will be the same before and after you've called your function.  If we take care of this in our subroutine we can call functions without worrying about what changes they're making to our registers.</p>
+
+                        <p>The CALL and RET instructions also use the stack.  When you CALL a subroutine, the address you called it from in your program is pushed onto the stack.  This address is then popped off the stack by RET and the program jumps back to that place in your code.  This is why you should always JMP to labels but you should CALL functions.</p>
+                                          
+                        <div class="snippet">
+                            <span class="filename">helloworld-len.asm</span>
+                            <pre class="brush: asm;">
+                            ; Hello World Program (Subroutines)
+                            ; Compile with: nasm -f elf helloworld-len.asm
+                            ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 helloworld-len.o -o helloworld-len
+                            ; Run with: ./helloworld-len
+
+                            SECTION .data
+                            msg     db      'Hello, brave new world!', 0AH
+
+                            SECTION .text
+                            global  _start
                                 
+                            _start: 
+
+                                mov     eax, msg        ; move the address of our message string into EAX
+                                call    strlen          ; call our function to calculate the length of the string
+                                
+                                mov     edx, eax        ; our function leaves the result in EAX
+                                mov     ecx, msg        ; this is all the same as before
+                                mov     ebx, 1
+                                mov     eax, 4
+                                int     80h
+                                
+                                mov     ebx, 0      
+                                mov     eax, 1      
+                                int     80h
+
+                            strlen:                     ; this is our first function declaration
+                                push    ebx             ; push the value in EBX onto the stack to preserve it while we use EBX in this function
+                                mov     ebx, eax        ; move the address in EAX into EBX (Both point to the same segment in memory)
+                                
+                            nextchar:                   ; this is the same as lesson3
+                                cmp     byte [eax], 0   
+                                jz      finished        
+                                inc     eax             
+                                jmp     nextchar        
+                                
+                            finished:
+                                sub     eax, ebx
+                                pop     ebx             ; pop the value on the stack back into EBX
+                                ret                     ; return to where the function was called
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf helloworld-len.asm</span>
+                                    <span>~$ ld -m elf_i386 helloworld-len.o -o helloworld-len</span>
+                                    <span>~$ ./helloworld-len</span>
+                                    <span>Hello, brave new world!</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </article>
+                </div>
+                
+                <hr>
+
+                <div class="row-fluid" id="lesson5">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 5</h2>
+                            <h4>External include files</h4>
+                        </header>
+
+                        <p>External include files allow us to move code from our program and put it into separate files. This technique is useful for writing clean, easy to maintain programs. Reusable bits of code can be written as subroutines and stored in separate files called libraries. When you need a piece of logic you can include the file in your program and use it as if they are part of the same file.</p>
+
+                        <p>In this lesson we will move our string length calculating subroutine into an external file.  We fill also make our string printing logic and program exit logic a subroutine and we will move them into this external file.  Once it's completed our actual program will be clean and easier to read.</p>
+
+                        <p>We can then declare another message variable and call our print function twice in order to demonstrate how we can reuse code.</p>
+
+                        <p>
+                            <span class="label label-info">Note:</span>
+                            I won't be showing the code in functions.asm after this lesson unless it changes. It will just be included if needed.
+                        </p>          
+                  
+                        <div class="snippet">
+                            <span class="filename">functions.asm</span>
+                            <pre class="brush: asm;">
+                            ;------------------------------------------
+                            ; int slen(String message)
+                            ; String length calculation function
+                            slen:                     
+                                push    ebx             
+                                mov     ebx, eax        
+                                
+                            nextchar:                   
+                                cmp     byte [eax], 0   
+                                jz      finished        
+                                inc     eax             
+                                jmp     nextchar        
+                                
+                            finished:
+                                sub     eax, ebx
+                                pop     ebx             
+                                ret                     
+
+
+                            ;------------------------------------------
+                            ; void sprint(String message)
+                            ; String printing function
+                            sprint:
+                                push    eax
+                                call    slen
+                                
+                                mov     edx, eax
+                                pop     eax
+                                
+                                mov     ecx, eax
+                                mov     ebx, 1
+                                mov     eax, 4
+                                int     80h
+                                ret
+
+
+                            ;------------------------------------------
+                            ; void exit()
+                            ; Exit program and restore resources
+                            quit:
+                                mov     ebx, 0      
+                                mov     eax, 1      
+                                int     80h
+                                ret
+
+
+                            </pre>
+                        </div>
+                        
+                        <div class="snippet">
+                            <span class="filename">helloworld-inc.asm</span>
+                            <pre class="brush: asm;">
+                            ; Hello World Program (External file include)
+                            ; Compile with: nasm -f elf helloworld-inc.asm
+                            ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 helloworld-inc.o -o helloworld-inc
+                            ; Run with: ./helloworld-inc
+
+                            %include        'functions.asm'                             ; include our external file
+
+                            SECTION .data
+                            msg1    db      'Hello, brave new world!', 0AH              ; our first message string
+                            msg2    db      'This is how we recycle in NASM.', 0AH      ; our second message string
+
+                            SECTION .text
+                            global  _start
+                                
+                            _start: 
+
+                                mov     eax, msg1       ; move the address of our first message string into EAX
+                                call    sprint          ; call our string printing function
+                                
+                                mov     eax, msg2       ; move the address of our second message string into EAX
+                                call    sprint          ; call our string printing function
+                                
+                                call    quit            ; call our quit function
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf helloworld-inc.asm</span>
+                                    <span>~$ ld -m elf_i386 helloworld-inc.o -o helloworld-inc</span>
+                                    <span>~$ ./helloworld-inc</span>
+                                    <span>Hello, brave new world!</span>
+                                    <span>This is how we recycle in NASM.</span>
+                                    <span>This is how we recycle in NASM.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p>
+                            <span class="label label-important">Error:</span>
+                            Our second message is outputted twice.  This is fixed in the next lesson.
+                        </p>
+                        
+                    </article>
+                </div>
+                
+                <hr>
+
+                <div class="row-fluid" id="lesson5">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 6</h2>
+                            <h4>NULL terminating bytes</h4>
+                        </header>
+
+                        <p>Ok so why did our second message print twice when we only called our sprint function on msg2 once?  Well actually it did only print once.  You can see what I mean if you comment out our second call to sprint.  The output will be both of our message strings.</p>
+
+                        <p>But how is this possible?</p>
+
+                        <p>What is happening is we weren't properly terminating our strings.  In assembly, variables are stored one after another in memory so the last byte of our msg1 variable is right next to the first byte of our msg2 variable.  We know our string length calculation is looking for a zero byte so unless our msg2 variable starts with a zero byte it keeps counting as if it's the same string (and as far as assembly is concerned it is the same string).  So we need to put a zero byte or 0H after our strings to let assembly know where to stop counting.</p>
+
+                        <p>
+                            <span class="label label-info">Note:</span>
+                            In programming 0H denotes a null byte and a null byte after a string tells assembly where it ends in memory.
+                        </p> 
+                                                
+                        <div class="snippet">
+                            <span class="filename">helloworld-inc.asm</span>
+                            <pre class="brush: asm;">
+                            ; Hello World Program (NULL terminating bytes)
+                            ; Compile with: nasm -f elf helloworld-inc.asm
+                            ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 helloworld-inc.o -o helloworld-inc
+                            ; Run with: ./helloworld-inc
+
+                            %include        'functions.asm'
+
+                            SECTION .data
+                            msg1    db      'Hello, brave new world!', 0AH, 0H          ; NOTE the null terminating byte
+                            msg2    db      'This is how we recycle in NASM.', 0AH, 0H  ; NOTE the null terminating byte
+
+                            SECTION .text
+                            global  _start
+                                
+                            _start: 
+
+                                mov     eax, msg1        
+                                call    sprint          
+
+                                mov     eax, msg2
+                                call    sprint
+
+                                call    quit
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf helloworld-inc.asm</span>
+                                    <span>~$ ld -m elf_i386 helloworld-inc.o -o helloworld-inc</span>
+                                    <span>~$ ./helloworld-inc</span>
+                                    <span>Hello, brave new world!</span>
+                                    <span>This is how we recycle in NASM.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </article>
+                </div>
+                                                
             </div>
         </div>
 
