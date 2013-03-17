@@ -370,7 +370,7 @@
 
                         <p>The stack is a special type of memory.  It's the same type of memory that we've used before however it's special in how it is used by our program.  The stack is what is call <strong>Last In First Out</strong> memory (LIFO).  You can think of the stack like a stack of plates in your kitchen.  The last plate you put on the stack is also the first plate you will take off the stack next time you use a plate.</p>
 
-                        <p>The stack in assembly is not storing plates though, its storing values.  You can store a lot of things on the stack such as variables, addresses or other programs.  We need to use the stack when we call subroutines to temporary store values that will be restored later.</p>
+                        <p>The stack in assembly is not storing plates though, its storing values.  You can store a lot of things on the stack such as variables, addresses or other programs.  We need to use the stack when we call subroutines to temporarily store values that will be restored later.</p>
 
                         <p>Any register that your function needs to use should have it's current value put on the stack for safe keeping using the PUSH instruction.  Then after the function has finished it's logic, these registers can have their original values restored using the POP instruction.  This means that any values in the registers will be the same before and after you've called your function.  If we take care of this in our subroutine we can call functions without worrying about what changes they're making to our registers.</p>
 
