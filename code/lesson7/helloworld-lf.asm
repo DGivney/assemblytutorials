@@ -15,9 +15,9 @@ global  _start
 _start: 
 
     mov     eax, msg1        
-    call    sprintLF    ; NOTE we are calling out new print with linefeed function
+    call    sprintLF    ; NOTE we are calling our new print with linefeed function
 
     mov     eax, msg2
-    call    sprintLF    ; NOTE we are calling out new print with linefeed function
+    call    sprintLF    ; NOTE we are calling our new print with linefeed function
 
     call    quit

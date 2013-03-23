@@ -58,6 +58,7 @@
                         <li><a href="#lesson4">Lesson 4 <span>Subroutines</span></a></li>
                         <li><a href="#lesson5">Lesson 5 <span>External include files</span></a></li>
                         <li><a href="#lesson6">Lesson 6 <span>NULL terminating bytes</span></a></li>
+                        <li><a href="#lesson7">Lesson 7 <span>Linefeeds</span></a></li>
                     </ul>
                 </div>
             </div>
@@ -111,7 +112,16 @@
                         <p><a class="btn" href="#lesson6">View details &raquo;</a></p>
                     </div>
                 </div>
-                                
+
+                <div class="row-fluid">
+                    <div class="span4">
+                        <h2>Lesson 7</h2>
+                        <h5>Linefeeds</h5>
+                        <p>How you can use the stack to print linefeeds after strings and an introduction to the Extended Stack Pointer register (ESP).</p>
+                        <p><a class="btn" href="#lesson7">View lesson &raquo;</a></p>
+                    </div>
+                </div>
+                                          
                 <hr>
                 
                 <div class="row-fluid" id="lesson1">
@@ -604,6 +614,129 @@
                                     <span>~$ nasm -f elf helloworld-inc.asm</span>
                                     <span>~$ ld -m elf_i386 helloworld-inc.o -o helloworld-inc</span>
                                     <span>~$ ./helloworld-inc</span>
+                                    <span>Hello, brave new world!</span>
+                                    <span>This is how we recycle in NASM.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </article>
+                </div>
+                
+                <hr>
+
+                <div class="row-fluid" id="lesson7">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 7</h2>
+                            <h4>Linefeeds</h4>
+                        </header>
+
+                        <p>
+                            <span class="label label-info">Note:</span>
+                            I've highlighted the new code in functions.asm below.
+                        </p>
+                        
+                        <div class="snippet">
+                            <span class="filename">functions.asm</span>
+                            <pre class="brush: asm;  highlight: [37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50]">
+                            ;------------------------------------------
+                            ; int slen(String message)
+                            ; String length calculation function
+                            slen:                     
+                                push    ebx             
+                                mov     ebx, eax        
+                                
+                            nextchar:                   
+                                cmp     byte [eax], 0   
+                                jz      finished        
+                                inc     eax             
+                                jmp     nextchar        
+                                
+                            finished:
+                                sub     eax, ebx
+                                pop     ebx             
+                                ret                     
+
+
+                            ;------------------------------------------
+                            ; void sprint(String message)
+                            ; String printing function
+                            sprint:
+                                push    eax
+                                call    slen
+                                
+                                mov     edx, eax
+                                pop     eax
+                                
+                                mov     ecx, eax
+                                mov     ebx, 1
+                                mov     eax, 4
+                                int     80h
+                                ret
+
+
+                            ;------------------------------------------
+                            ; void sprintLF(String message)
+                            ; String printing with line feed function
+                            sprintLF:
+                                call    sprint
+
+                                push    eax         ; push eax onto the stack to preserve it while we use the eax register in this function
+                                mov     eax, 0AH    ; move 0AH into eax - 0AH is the ascii character for a linefeed
+                                push    eax         ; push the linefeed onto the stack so we can get the address
+                                mov     eax, esp    ; move the address of the current stack pointer into eax for sprint
+                                call    sprint      ; call our sprint function
+                                pop     eax         ; remove our linefeed character from the stack
+                                pop     eax         ; restore the original value of eax before our function was called
+                                ret                 ; return to our program
+
+                                
+                            ;------------------------------------------
+                            ; void exit()
+                            ; Exit program and restore resources
+                            quit:
+                                mov     ebx, 0      
+                                mov     eax, 1      
+                                int     80h
+                                ret
+
+
+                            </pre>
+                        </div>
+                                                
+                        <div class="snippet">
+                            <span class="filename">helloworld-lf.asm</span>
+                            <pre class="brush: asm;">
+                            ; Hello World Program (Print with line feed)
+                            ; Compile with: nasm -f elf helloworld-lf.asm
+                            ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 helloworld-lf.o -o helloworld-lf
+                            ; Run with: ./helloworld-lf
+
+                            %include        'functions.asm'
+
+                            SECTION .data
+                            msg1    db      'Hello, brave new world!', 0H          ; NOTE we have removed the line feed character 0AH
+                            msg2    db      'This is how we recycle in NASM.', 0H  ; NOTE we have removed the line feed character 0AH
+
+                            SECTION .text
+                            global  _start
+                                
+                            _start: 
+
+                                mov     eax, msg1        
+                                call    sprintLF    ; NOTE we are calling our new print with linefeed function
+
+                                mov     eax, msg2
+                                call    sprintLF    ; NOTE we are calling our new print with linefeed function
+
+                                call    quit
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf helloworld-lf.asm</span>
+                                    <span>~$ ld -m elf_i386 helloworld-lf.o -o helloworld-lf</span>
+                                    <span>~$ ./helloworld-lf</span>
                                     <span>Hello, brave new world!</span>
                                     <span>This is how we recycle in NASM.</span>
                                 </div>
