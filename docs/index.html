@@ -59,6 +59,8 @@
                         <li><a href="#lesson5">Lesson 5 <span>External include files</span></a></li>
                         <li><a href="#lesson6">Lesson 6 <span>NULL terminating bytes</span></a></li>
                         <li><a href="#lesson7">Lesson 7 <span>Linefeeds</span></a></li>
+                        <li><a href="#lesson8">Lesson 8 <span>Passing arguments</span></a></li>
+                        <li><a href="#lesson9">Lesson 9 <span>User input</span></a></li>
                     </ul>
                 </div>
             </div>
@@ -117,8 +119,20 @@
                     <div class="span4">
                         <h2>Lesson 7</h2>
                         <h5>Linefeeds</h5>
-                        <p>How you can use the stack to print linefeeds after strings and an introduction to the Extended Stack Pointer register (ESP).</p>
+                        <p>How you can use the stack to print linefeeds after strings and an introduction to the Extended Stack Pointer ESP.</p>
                         <p><a class="btn" href="#lesson7">View lesson &raquo;</a></p>
+                    </div>
+                    <div class="span4">
+                        <h2>Lesson 8</h2>
+                        <h5>Passing arguments</h5>
+                        <p>Passing arguments to your program from the command line.</p>
+                        <p><a class="btn" href="#lesson8">View lesson &raquo;</a></p>
+                    </div>
+                    <div class="span4">
+                        <h2>Lesson 9</h2>
+                        <h5>User input</h5>
+                        <p>Introduction to the BSS section and how to trigger a call to sys_read to process user input.</p>
+                        <p><a class="btn" href="#lesson9">View lesson &raquo;</a></p>
                     </div>
                 </div>
                                           
@@ -144,7 +158,7 @@
                         
                             <p>We can accomplish this all in assembly by loading EAX with the function number (operation code OPCODE) we want to execute and filling the remaining registers with the arguments we want to pass to the system call. A software interrupt is requested with the INT instruction and the kernel takes over and calls the function from the library with our arguments. Simple.</p>
 
-                            <p>For example requesting an interrupt when EAX=1 will call sys_exit() and requesting an interrupt when EAX=4 will call sys_write() instead. EBX, ECX & EDX will be passed as arguments if the function requires them. <a href="http://docs.cs.up.ac.za/programming/asm/derick_tut/syscalls.html" target="_blank">Click here to view an example of a Linux System Call Table and its corresponding OPCODES.</a></p>
+                            <p>For example requesting an interrupt when EAX=1 will call sys_exit and requesting an interrupt when EAX=4 will call sys_write instead. EBX, ECX & EDX will be passed as arguments if the function requires them. <a href="http://docs.cs.up.ac.za/programming/asm/derick_tut/syscalls.html" target="_blank">Click here to view an example of a Linux System Call Table and its corresponding OPCODES.</a></p>
 
                             <h5>Writing our program</h5>
 
@@ -313,7 +327,7 @@
                             ; Run with: ./helloworld-len
 
                             SECTION .data
-                            msg     db      'Hello, brave new world!', 0AH ; we can modify this now without having to update anywhere else in the program
+                            msg     db      'Hello, brave new world!', 0Ah ; we can modify this now without having to update anywhere else in the program
 
                             SECTION .text
                             global  _start
@@ -395,7 +409,7 @@
                             ; Run with: ./helloworld-len
 
                             SECTION .data
-                            msg     db      'Hello, brave new world!', 0AH
+                            msg     db      'Hello, brave new world!', 0Ah
 
                             SECTION .text
                             global  _start
@@ -489,6 +503,9 @@
                             ; void sprint(String message)
                             ; String printing function
                             sprint:
+                                push    edx 
+                                push    ecx
+                                push    ebx
                                 push    eax
                                 call    slen
                                 
@@ -499,6 +516,10 @@
                                 mov     ebx, 1
                                 mov     eax, 4
                                 int     80h
+                                
+                                pop     ebx
+                                pop     ecx
+                                pop     edx
                                 ret
 
 
@@ -526,8 +547,8 @@
                             %include        'functions.asm'                             ; include our external file
 
                             SECTION .data
-                            msg1    db      'Hello, brave new world!', 0AH              ; our first message string
-                            msg2    db      'This is how we recycle in NASM.', 0AH      ; our second message string
+                            msg1    db      'Hello, brave new world!', 0Ah              ; our first message string
+                            msg2    db      'This is how we recycle in NASM.', 0Ah      ; our second message string
 
                             SECTION .text
                             global  _start
@@ -575,11 +596,11 @@
 
                         <p>But how is this possible?</p>
 
-                        <p>What is happening is we weren't properly terminating our strings.  In assembly, variables are stored one after another in memory so the last byte of our msg1 variable is right next to the first byte of our msg2 variable.  We know our string length calculation is looking for a zero byte so unless our msg2 variable starts with a zero byte it keeps counting as if it's the same string (and as far as assembly is concerned it is the same string).  So we need to put a zero byte or 0H after our strings to let assembly know where to stop counting.</p>
+                        <p>What is happening is we weren't properly terminating our strings.  In assembly, variables are stored one after another in memory so the last byte of our msg1 variable is right next to the first byte of our msg2 variable.  We know our string length calculation is looking for a zero byte so unless our msg2 variable starts with a zero byte it keeps counting as if it's the same string (and as far as assembly is concerned it is the same string).  So we need to put a zero byte or 0h after our strings to let assembly know where to stop counting.</p>
 
                         <p>
                             <span class="label label-info">Note:</span>
-                            In programming 0H denotes a null byte and a null byte after a string tells assembly where it ends in memory.
+                            In programming 0h denotes a null byte and a null byte after a string tells assembly where it ends in memory.
                         </p> 
                                                 
                         <div class="snippet">
@@ -593,8 +614,8 @@
                             %include        'functions.asm'
 
                             SECTION .data
-                            msg1    db      'Hello, brave new world!', 0AH, 0H          ; NOTE the null terminating byte
-                            msg2    db      'This is how we recycle in NASM.', 0AH, 0H  ; NOTE the null terminating byte
+                            msg1    db      'Hello, brave new world!', 0Ah, 0h          ; NOTE the null terminating byte
+                            msg2    db      'This is how we recycle in NASM.', 0Ah, 0h  ; NOTE the null terminating byte
 
                             SECTION .text
                             global  _start
@@ -632,6 +653,14 @@
                             <h4>Linefeeds</h4>
                         </header>
 
+                        <p>Linefeeds are essential to console programs like our 'hello world' program.  They become even more important once we start building programs that require user input. But linefeeds can be a pain to maintain.  Sometimes you will want to include them in your strings and sometimes you will want to remove them.  If we continue to hard code them in our variables by adding 0Ah after our declared message text, it will become a problem.  If there's a place in the code that we don't want to print out the linefeed for that variable we will need to write some extra logic remove it from the string at runtime.</p>
+
+                        <p>It would be better for the maintainability of our program if we write a subroutine that will print out our message and then print a linefeed afterwards. That way we can just call this subroutine when we need the linefeed and call our current sprint subroutine when we don't.</p>
+
+                        <p>A call to sys_write requires we pass a pointer to an address in memory of the string we want to print so we can't just pass a linefeed character (0Ah) to our print function.  We also don't want to create another variable just to hold a linefeed character so we will instead use the stack.</p>
+
+                        <p>The way it works is by moving a linefeed character into EAX.  We then push EAX onto the stack and get the address pointed to by the Extended Stack Pointer.  ESP is another register.  When you push items onto the stack, ESP is decremented to point to the address in memory of the last item and so it can be used to access that item directly from the stack. Since ESP points to an address in memory of a character, sys_write will be able to use it to print.</p>
+
                         <p>
                             <span class="label label-info">Note:</span>
                             I've highlighted the new code in functions.asm below.
@@ -639,7 +668,7 @@
                         
                         <div class="snippet">
                             <span class="filename">functions.asm</span>
-                            <pre class="brush: asm;  highlight: [37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50]">
+                            <pre class="brush: asm;  highlight: [44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57]">
                             ;------------------------------------------
                             ; int slen(String message)
                             ; String length calculation function
@@ -663,6 +692,9 @@
                             ; void sprint(String message)
                             ; String printing function
                             sprint:
+                                push    edx
+                                push    ecx
+                                push    ebx
                                 push    eax
                                 call    slen
                                 
@@ -673,6 +705,10 @@
                                 mov     ebx, 1
                                 mov     eax, 4
                                 int     80h
+                                
+                                pop     ebx
+                                pop     ecx
+                                pop     edx
                                 ret
 
 
@@ -683,7 +719,7 @@
                                 call    sprint
 
                                 push    eax         ; push eax onto the stack to preserve it while we use the eax register in this function
-                                mov     eax, 0AH    ; move 0AH into eax - 0AH is the ascii character for a linefeed
+                                mov     eax, 0Ah    ; move 0Ah into eax - 0Ah is the ascii character for a linefeed
                                 push    eax         ; push the linefeed onto the stack so we can get the address
                                 mov     eax, esp    ; move the address of the current stack pointer into eax for sprint
                                 call    sprint      ; call our sprint function
@@ -716,8 +752,8 @@
                             %include        'functions.asm'
 
                             SECTION .data
-                            msg1    db      'Hello, brave new world!', 0H          ; NOTE we have removed the line feed character 0AH
-                            msg2    db      'This is how we recycle in NASM.', 0H  ; NOTE we have removed the line feed character 0AH
+                            msg1    db      'Hello, brave new world!', 0h          ; NOTE we have removed the line feed character 0Ah
+                            msg2    db      'This is how we recycle in NASM.', 0h  ; NOTE we have removed the line feed character 0Ah
 
                             SECTION .text
                             global  _start
@@ -742,7 +778,163 @@
                                 </div>
                             </div>
                         </div>
+                        
+                    </article>
+                </div>
+                
+                <hr>
 
+                <div class="row-fluid" id="lesson8">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 8</h2>
+                            <h4>Passing arguments</h4>
+                        </header>
+
+                        <p>Passing arguments to your program from the command line is as easy as popping them off the stack in NASM. When we run our program, any passed arguments are loaded onto the stack in reverse order.  The name of the program is then loaded onto the stack and lastly the total number of arguments is loaded onto the stack. The last two stack items for a NASM compiled program are always the name of the program and the number of passed arguments.</p>
+
+                        <p>So all we have to do to use them is pop the number of arguments off the stack first, then iterate once for each argument and perform our logic. In our program that means calling our print function.</p>
+
+                        <p>
+                            <span class="label label-info">Note:</span>
+                            We are using the ECX register as our counter for the loop. Although it's a general-purpose register it's original intention was to be used as a counter.
+                        </p>
+                                                                        
+                        <div class="snippet">
+                            <span class="filename">helloworld-args.asm</span>
+                            <pre class="brush: asm;">
+                            ; Hello World Program (Passing arguments from the command line)
+                            ; Compile with: nasm -f elf helloworld-args.asm
+                            ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 helloworld-args.o -o helloworld-args
+                            ; Run with: ./helloworld-args
+
+                            %include        'functions.asm'
+
+                            SECTION .text
+                            global  _start
+                                
+                            _start: 
+
+                                pop     ecx             ; first value on the stack is the number of arguments
+                                
+                            nextArg:
+                                cmp     ecx, 0h         ; check to see if we have any arguments left
+                                jz      noMoreArgs      ; if zero flag is set jump to noMoreArgs label (jumping over the end of the loop)
+                                pop     eax             ; pop the next argument off the stack
+                                call    sprintLF        ; call our print with linefeed function
+                                dec		ecx             ; decrease ecx (number of arguments left) by 1
+                                jmp     nextArg         ; jump to nextArg label
+                                
+                            noMoreArgs:   
+                                call    quit
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf helloworld-args.asm</span>
+                                    <span>~$ ld -m elf_i386 helloworld-lf.o -o helloworld-args</span>
+                                    <span>~$ ./helloworld-args "This is one argument" "This is another" 101</span>
+                                    <span>./helloworld-args</span>
+                                    <span>This is one argument</span>
+                                    <span>This is another</span>
+                                    <span>101</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </article>
+                </div>
+                
+                <hr>
+
+                <div class="row-fluid" id="lesson9">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 9</h2>
+                            <h4>User input</h4>
+                        </header>
+
+                        <h5>Introduction to the .bss section</h5>
+
+                        <p>So far we've used the .text and .data section so now it's time to introduce the .bss section. BSS stands for Block Started by Symbol.  It is an area in our program that is used to reserve space in memory for uninitialised variables. We will use it to reserve some space in memory to hold our user input since we don't know how many bytes we'll need to store.</p>
+
+                        <p>The syntax to declare variables is as follows:</p>
+
+                        <div class="snippet">
+                            <pre class="brush: asm;">
+                            SECTION .bss
+                            variableName1       RESB    1       ; reserve space for 1 byte
+                            variableName2       RESW    1       ; reserve space for 1 word
+                            variableName3       RESD    1       ; reserve space for 1 double word
+                            variableName4       RESQ    1       ; reserve space for 1 double precision float (quad word)
+                            variableName5       REST    1       ; reserve space for 1 extended precision float
+                            </pre>
+                        </div>
+                        
+                        <h5>Writing our program</h5>
+
+                        <p>We will be using the system call sys_read to receive and process input from the user. This function is assigned OPCODE 3 in the Linux System Call Table. Just like sys_write this function also takes 3 arguments which will be loaded into EDX, ECX and EBX before requesting a software interrupt that will call the function.</p>
+
+                        <p>The arguments passed are as follows:
+                            <ul>
+                                <li> EDX will be loaded with the maximum length (in bytes) of the our space in memory.</li>
+                                <li> ECX will be loaded with the address of our variable created in the .bss section.</li>
+                                <li> EBX will be loaded with the file we want to write to – in this case STDIN.</li>
+                            </ul>
+                            As always the datatype and meaning of the arguments passed can be found in the function's definition.
+                        </p>
+
+                        <p>When sys_read detects a linefeed, control returns to the program and the users input is located at the memory address you passed in ECX.</p>
+
+                        <div class="snippet">
+                            <span class="filename">helloworld-input.asm</span>
+                            <pre class="brush: asm;">
+                            ; Hello World Program (Getting input)
+                            ; Compile with: nasm -f elf helloworld-input.asm
+                            ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 helloworld-input.o -o helloworld-input
+                            ; Run with: ./helloworld-input
+
+                            %include        'functions.asm'
+
+                            SECTION .data
+                            msg1        db      'Please enter your name: ', 0h      ; message string asking user for input
+                            msg2        db      'Hello, ', 0h                       ; message string to use after user has entered their name
+
+                            SECTION .bss
+                            sinput:     resb    255                                 ; reserve a 255 byte space in memory for the users input string
+                                
+                            SECTION .text
+                            global  _start
+                                
+                            _start: 
+
+                                mov     eax, msg1       
+                                call    sprint
+
+                                mov     edx, 255        ; number of bytes to read
+                                mov     ecx, sinput     ; reserved space to store our input (known as a buffer)
+                                mov     ebx, 0          ; write to the STDIN file
+                                mov     eax, 3          ; invoke SYS_READ (kernel opcode 3)
+                                int     80h
+
+                                mov     eax, msg2       
+                                call    sprint
+
+                                mov     eax, sinput     ; move our buffer into eax (Note: input contains a linefeed)
+                                call    sprint          ; call our print function
+                                
+                                call    quit                                           
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf helloworld-input.asm</span>
+                                    <span>~$ ld -m elf_i386 helloworld-input.o -o helloworld-input</span>
+                                    <span>~$ ./helloworld-input</span>
+                                    <span>Please enter your name: Daniel Givney</span>
+                                    <span>Hello, Daniel Givney</span>
+                                </div>
+                            </div>
+                        </div>
+                        
                     </article>
                 </div>
                                                 
