@@ -22,7 +22,7 @@ nextNumber:
     call    sprintLF        ; call our print function
     
     pop     eax             ; clean up the stack so we don't have unneeded bytes taking up space
-    cmp     ecx, 10         ; have we reached 10 yet?
-    jne     nextNumber      ; no? keep counting
+    cmp     ecx, 10         ; have we reached 10 yet? compare our counter with decimal 10
+    jne     nextNumber      ; jump if not equal and keep counting
       
     call    quit

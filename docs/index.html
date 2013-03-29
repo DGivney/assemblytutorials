@@ -61,6 +61,7 @@
                         <li><a href="#lesson7">Lesson 7 <span>Linefeeds</span></a></li>
                         <li><a href="#lesson8">Lesson 8 <span>Passing arguments</span></a></li>
                         <li><a href="#lesson9">Lesson 9 <span>User input</span></a></li>
+                        <li><a href="#lesson10">Lesson 10 <span>Count to 10</span></a></li>
                     </ul>
                 </div>
             </div>
@@ -133,6 +134,15 @@
                         <h5>User input</h5>
                         <p>Introduction to the BSS section and how to trigger a call to sys_read to process user input.</p>
                         <p><a class="btn" href="#lesson9">View lesson &raquo;</a></p>
+                    </div>
+                </div>
+                
+                <div class="row-fluid">
+                    <div class="span4">
+                        <h2>Lesson 10</h2>
+                        <h5>Count to 10</h5>
+                        <p>Introduction to numbers and counting in assembly.</p>
+                        <p><a class="btn" href="#lesson10">View lesson &raquo;</a></p>
                     </div>
                 </div>
                                           
@@ -935,6 +945,84 @@
                                 </div>
                             </div>
                         </div>
+                        
+                    </article>
+                </div>
+                
+                <hr>
+
+                <div class="row-fluid" id="lesson10">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 10</h2>
+                            <h4>Count to 10</h4>
+                        </header>
+
+                        <h5>Firstly, some background</h5>
+                        
+                        <p>Counting by numbers is not as straight forward as you would think in assembly.  Firstly we need to pass sys_write an address in memory so we can't just load our register with a number and call our print function.  Secondly, numbers and strings are very different things in assembly.  Strings are represented by what are called ASCII values.  ASCII stands for <strong>American Standard Code for Information Interchange</strong>.  A good reference for ASCII <a href=”http://www.asciitable.com/”>can be found here</a>. ASCII was created as a way to standardise the representation of strings across all computers.</p>
+
+                        <p>Remember, we can't print a number - we have to print a string. In order to count to 10 we will need to convert our numbers from standard integers to their ASCII string representations.  Have a look at the ASCII values table and notice that the string representation for the number '1' is actually '49' in ASCII. In fact, adding 48 to our numbers is all we have to do to convert them from integers to their ASCII string representations.</p>
+
+                        <h5>Writing our program</h5>
+
+                        <p>What we will do with our program is count from 1 to 10 using the ECX register.  We will then add 48 to our counter to convert it from a number to it's ASCII string representation.  We will then push this value to the stack and call our print function passing ESP as the memory address to print from.  Once we have finished counting to 10 we will call our quit function.</p>
+
+                        <div class="snippet">
+                            <span class="filename">helloworld-10.asm</span>
+                            <pre class="brush: asm;">
+                            ; Hello World Program (Count to 10)
+                            ; Compile with: nasm -f elf helloworld-10.asm
+                            ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 helloworld-10.o -o helloworld-10
+                            ; Run with: ./helloworld-10
+
+                            %include        'functions.asm'
+
+                            SECTION .text
+                            global  _start
+                                
+                            _start: 
+
+                                mov     ecx, 0          ; ecx is initalised to zero.
+                                
+                            nextNumber:
+                                inc     ecx             ; increment ecx
+                                
+                                mov     eax, ecx        ; move the address of our integer into eax
+                                add     eax, 48         ; add 48 to our number to convert from integer to ascii for printing
+                                push    eax             ; push eax to the stack
+                                mov     eax, esp        ; get the address of the character on the stack
+                                call    sprintLF        ; call our print function
+                                
+                                pop     eax             ; clean up the stack so we don't have unneeded bytes taking up space
+                                cmp     ecx, 10         ; have we reached 10 yet? compare our counter with decimal 10
+                                jne     nextNumber      ; jump if not equal and keep counting
+                                  
+                                call    quit                                        
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf helloworld-10.asm</span>
+                                    <span>~$ ld -m elf_i386 helloworld-10.o -o helloworld-10</span>
+                                    <span>~$ ./helloworld-10</span>
+                                    <span>1</span>
+                                    <span>2</span>
+                                    <span>3</span>
+                                    <span>4</span>
+                                    <span>5</span>
+                                    <span>6</span>
+                                    <span>7</span>
+                                    <span>8</span>
+                                    <span>9</span>
+                                    <span>:</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p>
+                            <span class="label label-important">Error:</span>
+                            Our number 10 prints a colon (:) character instead.  What's going on?
+                        </p>
                         
                     </article>
                 </div>
