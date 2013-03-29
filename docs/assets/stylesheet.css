@@ -34,3 +34,13 @@ div.snippet div.output .inner span { display: block; clear: both; line-height: 1
 /* fix for bootstrap to play nice with syntaxhighlighter */
 .syntaxhighlighter table td.code .container:before,
 .syntaxhighlighter table td.code .container:after { display: none; }
+
+/* Tablet
+------------------------- */
+@media (max-width: 767px) {
+  .sidebar-nav.affix {
+    position: static;
+    width: auto;
+    top: 0;
+  }
+}

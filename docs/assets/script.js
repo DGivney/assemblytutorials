@@ -5,7 +5,7 @@ $(document).ready(function() {
     }).html(function(i, v) {
         return v.replace(/(SYS_)([^\s]*)/gi, '<span class="function-name">$1$2</span>');
     }).html(function(i, v) {
-        return v.replace(/\s(ADD|SUB|MOV|INT|CALL|RET|CMP|PUSH|POP)\s/gi, ' <span class="instruction-name">$1</span> ');
+        return v.replace(/\s(ADD|SUB|MOV|INT|RET|CMP|PUSH|POP)\s/gi, ' <span class="instruction-name">$1</span> ');
     });
 
 });
