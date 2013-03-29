@@ -10,19 +10,19 @@ global  _start
     
 _start: 
 
-    mov     edi, 0
+    mov     ecx, 0          ; ecx is initalised to zero.
     
 nextNumber:
-    inc     edi
+    inc     ecx             ; increment ecx
     
-    mov     eax, edi
-    add     eax, 48
-    push    eax
-    mov     eax, esp
-    call    sprintLF
+    mov     eax, ecx        ; move the address of our integer into eax
+    add     eax, 48         ; add 48 to our number to convert from integer to ascii for printing
+    push    eax             ; push eax to the stack
+    mov     eax, esp        ; get the address of the character on the stack
+    call    sprintLF        ; call our print function
     
-    pop     eax
-    cmp     edi, 10
-    jne     nextNumber
+    pop     eax             ; clean up the stack so we don't have unneeded bytes taking up space
+    cmp     ecx, 10         ; have we reached 10 yet?
+    jne     nextNumber      ; no? keep counting
       
     call    quit
