@@ -408,7 +408,7 @@
 
                         <p>Any register that your function needs to use should have it's current value put on the stack for safe keeping using the PUSH instruction.  Then after the function has finished it's logic, these registers can have their original values restored using the POP instruction.  This means that any values in the registers will be the same before and after you've called your function.  If we take care of this in our subroutine we can call functions without worrying about what changes they're making to our registers.</p>
 
-                        <p>The CALL and RET instructions also use the stack.  When you CALL a subroutine, the address you called it from in your program is pushed onto the stack.  This address is then popped off the stack by RET and the program jumps back to that place in your code.  This is why you should always JMP to labels but you should CALL functions.</p>
+                        <p>The <span class="instruction-name">CALL</span> and RET instructions also use the stack.  When you <span class="instruction-name">CALL</span> a subroutine, the address you called it from in your program is pushed onto the stack.  This address is then popped off the stack by RET and the program jumps back to that place in your code.  This is why you should always JMP to labels but you should <span class="instruction-name">CALL</span> functions.</p>
                                           
                         <div class="snippet">
                             <span class="filename">helloworld-len.asm</span>
