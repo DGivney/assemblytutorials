@@ -10,12 +10,12 @@ iprint:
     
 divideLoop:
     inc     ecx             ; count each byte to print - number of characters
-    xor     edx, edx        ; empty edx
+    mov     edx, 0          ; empty edx
     mov     esi, 10         ; mov 10 into esi
     idiv    esi             ; divide eax by esi
     add     edx, 48         ; convert edx to it's ascii representation - edx holds the remainder after a divide instruction
     push    edx             ; push edx (string representation of an intger) onto the stack
-    xor     eax, 0          ; can the integer be divided anymore?
+    cmp     eax, 0          ; can the integer be divided anymore?
     jnz     divideLoop      ; jump if not zero to the label divideLoop
 
 printLoop:
