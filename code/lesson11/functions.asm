@@ -46,7 +46,7 @@ iprintLF:
     call    sprint          ; call our sprint function
     pop     eax             ; remove our linefeed character from the stack
     pop     eax             ; restore the original value of eax before our function was called
-    ret                     ; return to our program
+    ret
 
     
 ;------------------------------------------

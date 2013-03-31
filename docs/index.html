@@ -62,6 +62,7 @@
                         <li><a href="#lesson8">Lesson 8 <span>Passing arguments</span></a></li>
                         <li><a href="#lesson9">Lesson 9 <span>User input</span></a></li>
                         <li><a href="#lesson10">Lesson 10 <span>Count to 10</span></a></li>
+                        <li><a href="#lesson11">Lesson 11 <span>Count to 10 (itoa)</span></a></li>
                     </ul>
                 </div>
             </div>
@@ -143,6 +144,12 @@
                         <h5>Count to 10</h5>
                         <p>Introduction to numbers and counting in assembly.</p>
                         <p><a class="btn" href="#lesson10">View lesson &raquo;</a></p>
+                    </div>
+                    <div class="span4">
+                        <h2>Lesson 11</h2>
+                        <h5>Count to 10 (itoa)</h5>
+                        <p>Introduction to ASCII and how to convert integers to their string representations in assembly.</p>
+                        <p><a class="btn" href="#lesson11">View lesson &raquo;</a></p>
                     </div>
                 </div>
                                           
@@ -1023,6 +1030,218 @@
                             <span class="label label-important">Error:</span>
                             Our number 10 prints a colon (:) character instead.  What's going on?
                         </p>
+                        
+                    </article>
+                </div>
+                
+                <hr>
+
+                <div class="row-fluid" id="lesson11">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 11</h2>
+                            <h4>Count to 10 (itoa)</h4>
+                        </header>
+
+                        <p>So why did our program in Lesson 10 print out a colon character instead of the number 10?.  Well lets have a look at our ASCII table.  We can see that the colon character has a ASCII value of 58.  We were adding 48 to our integers to convert them to their ASCII string representations so instead of passing sys_write the value '58' to print ten we actually need to pass the ASCII value for the number 1 followed by the ASCII value for the number 0. Passing sys_write '4948' is the correct string representation for the number '10'. So we can't just simply add 48 to our numbers to convert them, we first have to divide them by 10 because each place value needs to be converted individually.</p>
+
+                        <p>We will write 2 new subroutines in this lesson 'iprint' and 'iprintLF'.  These functions will be used when we want to print ASCII string representations of numbers.  We achieve this by passing the number in EAX.  We then initialise a counter in ECX.  We will repeatedly divide the number by 10 and each time convert the remainder to a string by adding 48.  We will then push this onto the stack for later use. Once we can no longer divide the number by 10 we will enter our second loop.  In this print loop we will print the now converted string representations from the stack and pop them off.  Popping them off the stack moves ESP forward to the next item on the stack. Each time we print a value we will decrease our counter ECX.  Once all numbers have been converted and printed we will return to our program.</p>
+
+                        <h5>How does the divide instruction work?</h5>
+
+                        <p>The DIV and IDIV instructions work by dividing whatever is in EAX by the value passed to the instruction.  The quotient part of the value is left in EAX and the remainder part is put into EDX (Originally called the data register).
+                        
+                        <p>For example.</p>
+
+                        <div class="snippet">
+                            <span class="filename">IDIV instruction example</span>
+                            <pre class="brush: asm;">
+                            mov     eax, 10         ; move 10 into eax
+                            mov     esi, 10         ; move 10 into esi
+                            idiv    esi             ; divide eax by esi (eax will equal 1 and edx will equal 0)
+                            idiv    esi             ; divide eax by esi again (eax will equal 0 and edx will equal 1)
+                            </pre>
+                        </div>
+
+                        <h5>If we are only storing the remainder won't we have problems?</h5>
+
+                        <p>No, because these are integers, when you divide a number by an even bigger number the quotient in EAX is 0 and the remainder is the number itself. This is because the number divides zero times leaving the original value as the remainder in EDX. How good is that?</p>
+
+                        <p>
+                            <span class="label label-info">Note:</span>
+                            Only the new functions iprint and iprintLF have comments.
+                        </p>
+                        
+                        <div class="snippet">
+                            <span class="filename">functions.asm</span>
+                            <pre class="brush: asm;">
+                            ;------------------------------------------
+                            ; void iprint(Integer number)
+                            ; Integer printing function (itoa)
+                            iprint:
+                                push    eax             ; preserve eax on the stack to be restored after function runs
+                                push    ecx             ; preserve ecx on the stack to be restored after function runs
+                                push    edx             ; preserve edx on the stack to be restored after function runs
+                                push    esi             ; preserve esi on the stack to be restored after function runs
+                                mov     ecx, 0          ; counter of how many bytes we need to print in the end
+                                
+                            divideLoop:
+                                inc     ecx             ; count each byte to print - number of characters
+                                mov     edx, 0          ; empty edx
+                                mov     esi, 10         ; mov 10 into esi
+                                idiv    esi             ; divide eax by esi
+                                add     edx, 48         ; convert edx to it's ascii representation - edx holds the remainder after a divide instruction
+                                push    edx             ; push edx (string representation of an intger) onto the stack
+                                cmp     eax, 0          ; can the integer be divided anymore?
+                                jnz     divideLoop      ; jump if not zero to the label divideLoop
+
+                            printLoop:
+                                dec     ecx             ; count down each byte that we put on the stack
+                                mov     eax, esp        ; mov the stack pointer into eax for printing
+                                call    sprint          ; call our string print function
+                                pop     eax             ; remove last character from the stack to move esp forward
+                                cmp     ecx, 0          ; have we printed all bytes we pushed onto the stack?
+                                jnz     printLoop       ; jump is not zero to the label printLoop
+
+                                pop     esi             ; restore esi from the value we pushed onto the stack at the start
+                                pop     edx             ; restore edx from the value we pushed onto the stack at the start
+                                pop     ecx             ; restore ecx from the value we pushed onto the stack at the start
+                                pop     eax             ; restore eax from the value we pushed onto the stack at the start
+                                ret
+
+
+                            ;------------------------------------------
+                            ; void iprintLF(Integer number)
+                            ; Integer printing function with linefeed (itoa)
+                            iprintLF:
+                                call    iprint          ; call our integer printing function
+
+                                push    eax             ; push eax onto the stack to preserve it while we use the eax register in this function
+                                mov     eax, 0Ah        ; move 0Ah into eax - 0Ah is the ascii character for a linefeed
+                                push    eax             ; push the linefeed onto the stack so we can get the address
+                                mov     eax, esp        ; move the address of the current stack pointer into eax for sprint
+                                call    sprint          ; call our sprint function
+                                pop     eax             ; remove our linefeed character from the stack
+                                pop     eax             ; restore the original value of eax before our function was called
+                                ret
+
+                                
+                            ;------------------------------------------
+                            ; int slen(String message)
+                            ; String length calculation function
+                            slen:                     
+                                push    ebx             
+                                mov     ebx, eax        
+                                
+                            nextchar:                   
+                                cmp     byte [eax], 0   
+                                jz      finished        
+                                inc     eax             
+                                jmp     nextchar        
+                                
+                            finished:
+                                sub     eax, ebx
+                                pop     ebx             
+                                ret                     
+
+
+                            ;------------------------------------------
+                            ; void sprint(String message)
+                            ; String printing function
+                            sprint:
+                                push    edx
+                                push    ecx
+                                push    ebx
+                                push    eax
+                                call    slen
+                                
+                                mov     edx, eax
+                                pop     eax
+                                
+                                mov     ecx, eax
+                                mov     ebx, 1
+                                mov     eax, 4
+                                int     80h
+
+                                pop     ebx
+                                pop     ecx
+                                pop     edx
+                                ret
+
+
+                            ;------------------------------------------
+                            ; void sprintLF(String message)
+                            ; String printing with line feed function
+                            sprintLF:
+                                call    sprint
+
+                                push    eax
+                                mov     eax, 0AH
+                                push    eax
+                                mov     eax, esp
+                                call    sprint
+                                pop     eax
+                                pop     eax
+                                ret
+
+                                
+                            ;------------------------------------------
+                            ; void exit()
+                            ; Exit program and restore resources
+                            quit:
+                                mov     ebx, 0      
+                                mov     eax, 1      
+                                int     80h
+                                ret
+
+                               
+                            </pre>
+                        </div>
+
+                        <div class="snippet">
+                            <span class="filename">helloworld-itoa.asm</span>
+                            <pre class="brush: asm;">
+                            ; Hello World Program (Count to 10 itoa)
+                            ; Compile with: nasm -f elf helloworld-itoa.asm
+                            ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 helloworld-itoa.o -o helloworld-itoa
+                            ; Run with: ./helloworld-itoa
+
+                            %include        'functions.asm'
+
+                            SECTION .text
+                            global  _start
+                                
+                            _start: 
+
+                                mov     ecx, 0
+                                
+                            nextNumber:
+                                inc     ecx
+                                mov     eax, ecx
+                                call    iprintLF        ; NOTE call our new integer printing function (itoa)
+                                cmp     ecx, 10
+                                jne     nextNumber
+                                  
+                                call    quit                                    
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf helloworld-itoa.asm</span>
+                                    <span>~$ ld -m elf_i386 helloworld-itoa.o -o helloworld-itoa</span>
+                                    <span>~$ ./helloworld-itoa</span>
+                                    <span>1</span>
+                                    <span>2</span>
+                                    <span>3</span>
+                                    <span>4</span>
+                                    <span>5</span>
+                                    <span>6</span>
+                                    <span>7</span>
+                                    <span>8</span>
+                                    <span>9</span>
+                                    <span>10</span>
+                                </div>
+                            </div>
+                        </div>
                         
                     </article>
                 </div>
