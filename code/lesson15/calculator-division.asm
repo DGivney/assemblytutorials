@@ -20,6 +20,6 @@ _start:
     mov     eax, msg1   ; move our message string into eax
     call    sprint      ; call our string print function
     mov     eax, edx    ; move our remainder into eax
-    call    iprintLF    ; call out integer printing with linefeed function
+    call    iprintLF    ; call our integer printing with linefeed function
 
     call    quit
