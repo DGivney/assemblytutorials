@@ -11,12 +11,12 @@
     <link href="./assets/stylesheet.css" rel="stylesheet">
     <link href="./assets/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet">
 
-	<script src="./assets/syntax-highlighter/scripts/shCore.js"></script>
-	<script src="./assets/syntax-highlighter/scripts/shBrushAsm.js"></script>
-	<link href="./assets/syntax-highlighter/styles/shCoreDefault.css" rel="stylesheet">
+    <script src="./assets/syntax-highlighter/scripts/shCore.js"></script>
+    <script src="./assets/syntax-highlighter/scripts/shBrushAsm.js"></script>
+    <link href="./assets/syntax-highlighter/styles/shCoreDefault.css" rel="stylesheet">
 
-	<script type="text/javascript">SyntaxHighlighter.all();</script>
-    
+    <script type="text/javascript">SyntaxHighlighter.all();</script>
+
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -43,11 +43,11 @@
                 </div>
             </div>
         </div>
-    </div>    
+    </div>
 
     <div class="container-fluid">
         <div class="row-fluid">
-            
+
             <div class="span3">
                 <div class="well span3 sidebar-nav affix">
                     <ul class="nav nav-list">
@@ -63,18 +63,22 @@
                         <li><a href="#lesson9">Lesson 9 <span>User input</span></a></li>
                         <li><a href="#lesson10">Lesson 10 <span>Count to 10</span></a></li>
                         <li><a href="#lesson11">Lesson 11 <span>Count to 10 (itoa)</span></a></li>
+                        <li><a href="#lesson12">Lesson 12 <span>Calculator - addition</span></a></li>
+                        <li><a href="#lesson13">Lesson 13 <span>Calculator - subtraction</span></a></li>
+                        <li><a href="#lesson14">Lesson 14 <span>Calculator - multiplication</span></a></li>
+                        <li><a href="#lesson15">Lesson 15 <span>Calculator - division</span></a></li>
                     </ul>
                 </div>
             </div>
-            
+
             <div class="span9 lessons">
-                
+
                 <div class="hero-unit">
                     <h2>Learn Assembly</h2>
                     <p>This project was put together to teach myself NASM 64bit assembly language on linux. The tutorials are designed to flow on from each other adding functionality at each stage.</p>
                     <p><a href="https://github.com/DGivney/assemblytutorials" class="btn btn-primary btn" target="_blank">Github Project &raquo;</a></p>
                 </div>
-                  
+
                 <div class="row-fluid">
                     <div class="span4">
                         <h2>Lesson 1</h2>
@@ -137,7 +141,7 @@
                         <p><a class="btn" href="#lesson9">View lesson &raquo;</a></p>
                     </div>
                 </div>
-                
+
                 <div class="row-fluid">
                     <div class="span4">
                         <h2>Lesson 10</h2>
@@ -151,10 +155,37 @@
                         <p>Introduction to ASCII and how to convert integers to their string representations in assembly.</p>
                         <p><a class="btn" href="#lesson11">View lesson &raquo;</a></p>
                     </div>
+                    <div class="span4">
+                        <h2>Lesson 12</h2>
+                        <h5>Calculator - addition</h5>
+                        <p>Introduction to calulating numbers in assembly.  This tutorial describes a simple program to add two numbers together.</p>
+                        <p><a class="btn" href="#lesson12">View lesson &raquo;</a></p>
+                    </div>
                 </div>
-                                          
+
+                <div class="row-fluid">
+                    <div class="span4">
+                        <h2>Lesson 13</h2>
+                        <h5>Calculator - subtraction</h5>
+                        <p>Introduction to calulating numbers in assembly.  This tutorial describes a simple program to subtract one number from another.</p>
+                        <p><a class="btn" href="#lesson13">View lesson &raquo;</a></p>
+                    </div>
+                    <div class="span4">
+                        <h2>Lesson 14</h2>
+                        <h5>Calculator - multiplication</h5>
+                        <p>Introduction to calulating numbers in assembly.  This tutorial describes a simple program to multiply two numbers together.</p>
+                        <p><a class="btn" href="#lesson14">View lesson &raquo;</a></p>
+                    </div>
+                    <div class="span4">
+                        <h2>Lesson 15</h2>
+                        <h5>Calculator - division</h5>
+                        <p>Introduction to calulating numbers in assembly.  This tutorial describes a simple program to divide one number from another.</p>
+                        <p><a class="btn" href="#lesson15">View lesson &raquo;</a></p>
+                    </div>
+                </div>
+
                 <hr>
-                
+
                 <div class="row-fluid" id="lesson1">
                     <article class="span12">
                         <header>
@@ -172,7 +203,7 @@
                                 <span class="label label-info">Note:</span>
                                 Drivers are called <i>drivers</i> because the kernel literally uses them to drive the hardware.
                             </p>
-                        
+
                             <p>We can accomplish this all in assembly by loading EAX with the function number (operation code OPCODE) we want to execute and filling the remaining registers with the arguments we want to pass to the system call. A software interrupt is requested with the INT instruction and the kernel takes over and calls the function from the library with our arguments. Simple.</p>
 
                             <p>For example requesting an interrupt when EAX=1 will call sys_exit and requesting an interrupt when EAX=4 will call sys_write instead. EBX, ECX & EDX will be passed as arguments if the function requires them. <a href="http://docs.cs.up.ac.za/programming/asm/derick_tut/syscalls.html" target="_blank">Click here to view an example of a Linux System Call Table and its corresponding OPCODES.</a></p>
@@ -208,7 +239,7 @@
                             SECTION .text
                             global  _start
 
-                            _start: 
+                            _start:
 
                                 mov     edx, 13     ; number of bytes to write - one for each letter plus 0Ah (line feed character)
                                 mov     ecx, msg    ; move the memory address of our message string into ecx
@@ -231,7 +262,7 @@
                             <span class="label label-important">Error:</span>
                             Segmentation fault
                         </p>
-                        
+
                     </article>
                 </div>
 
@@ -272,7 +303,7 @@
                             <span class="label label-info">Note:</span>
                             Only new code added in each lesson will be commented.
                         </p>
-                        
+
                         <div class="snippet">
                             <span class="filename">helloworld.asm</span>
                             <pre class="brush: asm;">
@@ -287,7 +318,7 @@
                             SECTION .text
                             global  _start
 
-                            _start: 
+                            _start:
 
                                 mov     edx, 13
                                 mov     ecx, msg
@@ -311,7 +342,7 @@
 
                     </article>
                 </div>
-                
+
                 <hr>
 
                 <div class="row-fluid" id="lesson3">
@@ -334,7 +365,7 @@
                         <p>To calculate the length of the string we will use a technique called pointer arithmetic.  Two registers are initialised pointing to the same address in memory.  One register (in this case EAX) will be incremented forward one byte for each character in the output string until we reach the end of the string.  The original pointer will then be subtracted from EAX.  This is effectively like subtraction between two arrays and the result yields the number of elements between the two addresses. This result is then passed to sys_write replacing our hard coded count.</p>
 
                         <p>The CMP instruction compares the left hand side against the right hand side and sets a number of flags that are used for program flow.  The flag we're checking is the ZF or Zero Flag.  When the byte that EAX points to is equal to zero the ZF flag is set.  We then use the JZ instruction to jump, if the ZF flag is set, to the point in our program labeled 'finished'. This is to break out of the nextchar loop and continue executing the rest of the program.</p>
-                                                
+
                         <div class="snippet">
                             <span class="filename">helloworld-len.asm</span>
                             <pre class="brush: asm;">
@@ -348,33 +379,33 @@
 
                             SECTION .text
                             global  _start
-                                
-                            _start: 
+
+                            _start:
 
                                 mov     ebx, msg        ; move the address of our message string into EBX
                                 mov     eax, ebx        ; move the address in EBX into EAX as well (Both now point to the same segment in memory)
-                                
+
                             nextchar:
                                 cmp     byte [eax], 0   ; compare the byte pointed to by EAX at this address against zero (Zero is an end of string delimiter)
                                 jz      finished        ; jump (if the zero flagged has been set) to the point in the code labeled 'finished'
                                 inc     eax             ; increment the address in EAX by one byte (if the zero flagged has NOT been set)
                                 jmp     nextchar        ; jump to the point in the code labeled 'nextchar'
-                                
+
                             finished:
                                 sub     eax, ebx        ; subtract the address in EBX from the address in EAX
                                                         ; remember both registers started pointing to the same address (see line 15)
                                                         ; but EAX has been incremented one byte for each character in the message string
                                                         ; when you subtract one memory address from another of the same type
                                                         ; the result is number of segments between them - in this case the number of bytes
-                                
+
                                 mov     edx, eax        ; EAX now equals the number of bytes in our string
                                 mov     ecx, msg        ; the rest of the code should be familiar now
                                 mov     ebx, 1
                                 mov     eax, 4
                                 int     80h
 
-                                mov     ebx, 0      
-                                mov     eax, 1      
+                                mov     ebx, 0
+                                mov     eax, 1
                                 int     80h
                             </pre>
                             <div class="output">
@@ -416,7 +447,7 @@
                         <p>Any register that your function needs to use should have it's current value put on the stack for safe keeping using the PUSH instruction.  Then after the function has finished it's logic, these registers can have their original values restored using the POP instruction.  This means that any values in the registers will be the same before and after you've called your function.  If we take care of this in our subroutine we can call functions without worrying about what changes they're making to our registers.</p>
 
                         <p>The <span class="instruction-name">CALL</span> and RET instructions also use the stack.  When you <span class="instruction-name">CALL</span> a subroutine, the address you called it from in your program is pushed onto the stack.  This address is then popped off the stack by RET and the program jumps back to that place in your code.  This is why you should always JMP to labels but you should <span class="instruction-name">CALL</span> functions.</p>
-                                          
+
                         <div class="snippet">
                             <span class="filename">helloworld-len.asm</span>
                             <pre class="brush: asm;">
@@ -430,32 +461,32 @@
 
                             SECTION .text
                             global  _start
-                                
-                            _start: 
+
+                            _start:
 
                                 mov     eax, msg        ; move the address of our message string into EAX
                                 call    strlen          ; call our function to calculate the length of the string
-                                
+
                                 mov     edx, eax        ; our function leaves the result in EAX
                                 mov     ecx, msg        ; this is all the same as before
                                 mov     ebx, 1
                                 mov     eax, 4
                                 int     80h
-                                
-                                mov     ebx, 0      
-                                mov     eax, 1      
+
+                                mov     ebx, 0
+                                mov     eax, 1
                                 int     80h
 
                             strlen:                     ; this is our first function declaration
                                 push    ebx             ; push the value in EBX onto the stack to preserve it while we use EBX in this function
                                 mov     ebx, eax        ; move the address in EAX into EBX (Both point to the same segment in memory)
-                                
+
                             nextchar:                   ; this is the same as lesson3
-                                cmp     byte [eax], 0   
-                                jz      finished        
-                                inc     eax             
-                                jmp     nextchar        
-                                
+                                cmp     byte [eax], 0
+                                jz      finished
+                                inc     eax
+                                jmp     nextchar
+
                             finished:
                                 sub     eax, ebx
                                 pop     ebx             ; pop the value on the stack back into EBX
@@ -473,7 +504,7 @@
 
                     </article>
                 </div>
-                
+
                 <hr>
 
                 <div class="row-fluid" id="lesson5">
@@ -492,48 +523,48 @@
                         <p>
                             <span class="label label-info">Note:</span>
                             I won't be showing the code in functions.asm after this lesson unless it changes. It will just be included if needed.
-                        </p>          
-                  
+                        </p>
+
                         <div class="snippet">
                             <span class="filename">functions.asm</span>
                             <pre class="brush: asm;">
                             ;------------------------------------------
                             ; int slen(String message)
                             ; String length calculation function
-                            slen:                     
-                                push    ebx             
-                                mov     ebx, eax        
-                                
-                            nextchar:                   
-                                cmp     byte [eax], 0   
-                                jz      finished        
-                                inc     eax             
-                                jmp     nextchar        
-                                
+                            slen:
+                                push    ebx
+                                mov     ebx, eax
+
+                            nextchar:
+                                cmp     byte [eax], 0
+                                jz      finished
+                                inc     eax
+                                jmp     nextchar
+
                             finished:
                                 sub     eax, ebx
-                                pop     ebx             
-                                ret                     
+                                pop     ebx
+                                ret
 
 
                             ;------------------------------------------
                             ; void sprint(String message)
                             ; String printing function
                             sprint:
-                                push    edx 
+                                push    edx
                                 push    ecx
                                 push    ebx
                                 push    eax
                                 call    slen
-                                
+
                                 mov     edx, eax
                                 pop     eax
-                                
+
                                 mov     ecx, eax
                                 mov     ebx, 1
                                 mov     eax, 4
                                 int     80h
-                                
+
                                 pop     ebx
                                 pop     ecx
                                 pop     edx
@@ -544,15 +575,15 @@
                             ; void exit()
                             ; Exit program and restore resources
                             quit:
-                                mov     ebx, 0      
-                                mov     eax, 1      
+                                mov     ebx, 0
+                                mov     eax, 1
                                 int     80h
                                 ret
 
 
                             </pre>
                         </div>
-                        
+
                         <div class="snippet">
                             <span class="filename">helloworld-inc.asm</span>
                             <pre class="brush: asm;">
@@ -569,15 +600,15 @@
 
                             SECTION .text
                             global  _start
-                                
-                            _start: 
+
+                            _start:
 
                                 mov     eax, msg1       ; move the address of our first message string into EAX
                                 call    sprint          ; call our string printing function
-                                
+
                                 mov     eax, msg2       ; move the address of our second message string into EAX
                                 call    sprint          ; call our string printing function
-                                
+
                                 call    quit            ; call our quit function
                             </pre>
                             <div class="output">
@@ -596,10 +627,10 @@
                             <span class="label label-important">Error:</span>
                             Our second message is outputted twice.  This is fixed in the next lesson.
                         </p>
-                        
+
                     </article>
                 </div>
-                
+
                 <hr>
 
                 <div class="row-fluid" id="lesson6">
@@ -618,8 +649,8 @@
                         <p>
                             <span class="label label-info">Note:</span>
                             In programming 0h denotes a null byte and a null byte after a string tells assembly where it ends in memory.
-                        </p> 
-                                                
+                        </p>
+
                         <div class="snippet">
                             <span class="filename">helloworld-inc.asm</span>
                             <pre class="brush: asm;">
@@ -636,11 +667,11 @@
 
                             SECTION .text
                             global  _start
-                                
-                            _start: 
 
-                                mov     eax, msg1        
-                                call    sprint          
+                            _start:
+
+                                mov     eax, msg1
+                                call    sprint
 
                                 mov     eax, msg2
                                 call    sprint
@@ -660,7 +691,7 @@
 
                     </article>
                 </div>
-                
+
                 <hr>
 
                 <div class="row-fluid" id="lesson7">
@@ -682,27 +713,27 @@
                             <span class="label label-info">Note:</span>
                             I've highlighted the new code in functions.asm below.
                         </p>
-                        
+
                         <div class="snippet">
                             <span class="filename">functions.asm</span>
                             <pre class="brush: asm;  highlight: [44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57]">
                             ;------------------------------------------
                             ; int slen(String message)
                             ; String length calculation function
-                            slen:                     
-                                push    ebx             
-                                mov     ebx, eax        
-                                
-                            nextchar:                   
-                                cmp     byte [eax], 0   
-                                jz      finished        
-                                inc     eax             
-                                jmp     nextchar        
-                                
+                            slen:
+                                push    ebx
+                                mov     ebx, eax
+
+                            nextchar:
+                                cmp     byte [eax], 0
+                                jz      finished
+                                inc     eax
+                                jmp     nextchar
+
                             finished:
                                 sub     eax, ebx
-                                pop     ebx             
-                                ret                     
+                                pop     ebx
+                                ret
 
 
                             ;------------------------------------------
@@ -714,15 +745,15 @@
                                 push    ebx
                                 push    eax
                                 call    slen
-                                
+
                                 mov     edx, eax
                                 pop     eax
-                                
+
                                 mov     ecx, eax
                                 mov     ebx, 1
                                 mov     eax, 4
                                 int     80h
-                                
+
                                 pop     ebx
                                 pop     ecx
                                 pop     edx
@@ -744,20 +775,20 @@
                                 pop     eax         ; restore the original value of eax before our function was called
                                 ret                 ; return to our program
 
-                                
+
                             ;------------------------------------------
                             ; void exit()
                             ; Exit program and restore resources
                             quit:
-                                mov     ebx, 0      
-                                mov     eax, 1      
+                                mov     ebx, 0
+                                mov     eax, 1
                                 int     80h
                                 ret
 
 
                             </pre>
                         </div>
-                                                
+
                         <div class="snippet">
                             <span class="filename">helloworld-lf.asm</span>
                             <pre class="brush: asm;">
@@ -774,10 +805,10 @@
 
                             SECTION .text
                             global  _start
-                                
-                            _start: 
 
-                                mov     eax, msg1        
+                            _start:
+
+                                mov     eax, msg1
                                 call    sprintLF    ; NOTE we are calling our new print with linefeed function
 
                                 mov     eax, msg2
@@ -795,10 +826,10 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                     </article>
                 </div>
-                
+
                 <hr>
 
                 <div class="row-fluid" id="lesson8">
@@ -816,7 +847,7 @@
                             <span class="label label-info">Note:</span>
                             We are using the ECX register as our counter for the loop. Although it's a general-purpose register it's original intention was to be used as a counter.
                         </p>
-                                                                        
+
                         <div class="snippet">
                             <span class="filename">helloworld-args.asm</span>
                             <pre class="brush: asm;">
@@ -829,20 +860,20 @@
 
                             SECTION .text
                             global  _start
-                                
-                            _start: 
+
+                            _start:
 
                                 pop     ecx             ; first value on the stack is the number of arguments
-                                
+
                             nextArg:
                                 cmp     ecx, 0h         ; check to see if we have any arguments left
                                 jz      noMoreArgs      ; if zero flag is set jump to noMoreArgs label (jumping over the end of the loop)
                                 pop     eax             ; pop the next argument off the stack
                                 call    sprintLF        ; call our print with linefeed function
-                                dec		ecx             ; decrease ecx (number of arguments left) by 1
+                                dec     ecx             ; decrease ecx (number of arguments left) by 1
                                 jmp     nextArg         ; jump to nextArg label
-                                
-                            noMoreArgs:   
+
+                            noMoreArgs:
                                 call    quit
                             </pre>
                             <div class="output">
@@ -857,10 +888,10 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                     </article>
                 </div>
-                
+
                 <hr>
 
                 <div class="row-fluid" id="lesson9">
@@ -887,7 +918,7 @@
                             variableName5:      REST    1       ; reserve space for 1 extended precision float
                             </pre>
                         </div>
-                        
+
                         <h5>Writing our program</h5>
 
                         <p>We will be using the system call sys_read to receive and process input from the user. This function is assigned OPCODE 3 in the Linux System Call Table. Just like sys_write this function also takes 3 arguments which will be loaded into EDX, ECX and EBX before requesting a software interrupt that will call the function.</p>
@@ -919,13 +950,13 @@
 
                             SECTION .bss
                             sinput:     resb    255                                 ; reserve a 255 byte space in memory for the users input string
-                                
+
                             SECTION .text
                             global  _start
-                                
-                            _start: 
 
-                                mov     eax, msg1       
+                            _start:
+
+                                mov     eax, msg1
                                 call    sprint
 
                                 mov     edx, 255        ; number of bytes to read
@@ -934,13 +965,13 @@
                                 mov     eax, 3          ; invoke SYS_READ (kernel opcode 3)
                                 int     80h
 
-                                mov     eax, msg2       
+                                mov     eax, msg2
                                 call    sprint
 
                                 mov     eax, sinput     ; move our buffer into eax (Note: input contains a linefeed)
                                 call    sprint          ; call our print function
-                                
-                                call    quit                                           
+
+                                call    quit
                             </pre>
                             <div class="output">
                                 <div class="inner">
@@ -952,10 +983,10 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                     </article>
                 </div>
-                
+
                 <hr>
 
                 <div class="row-fluid" id="lesson10">
@@ -966,7 +997,7 @@
                         </header>
 
                         <h5>Firstly, some background</h5>
-                        
+
                         <p>Counting by numbers is not as straight forward as you would think in assembly.  Firstly we need to pass sys_write an address in memory so we can't just load our register with a number and call our print function.  Secondly, numbers and strings are very different things in assembly.  Strings are represented by what are called ASCII values.  ASCII stands for <strong>American Standard Code for Information Interchange</strong>.  A good reference for ASCII <a href=”http://www.asciitable.com/”>can be found here</a>. ASCII was created as a way to standardise the representation of strings across all computers.</p>
 
                         <p>Remember, we can't print a number - we have to print a string. In order to count to 10 we will need to convert our numbers from standard integers to their ASCII string representations.  Have a look at the ASCII values table and notice that the string representation for the number '1' is actually '49' in ASCII. In fact, adding 48 to our numbers is all we have to do to convert them from integers to their ASCII string representations.</p>
@@ -987,25 +1018,25 @@
 
                             SECTION .text
                             global  _start
-                                
-                            _start: 
+
+                            _start:
 
                                 mov     ecx, 0          ; ecx is initalised to zero.
-                                
+
                             nextNumber:
                                 inc     ecx             ; increment ecx
-                                
+
                                 mov     eax, ecx        ; move the address of our integer into eax
                                 add     eax, 48         ; add 48 to our number to convert from integer to ascii for printing
                                 push    eax             ; push eax to the stack
                                 mov     eax, esp        ; get the address of the character on the stack
                                 call    sprintLF        ; call our print function
-                                
+
                                 pop     eax             ; clean up the stack so we don't have unneeded bytes taking up space
                                 cmp     ecx, 10         ; have we reached 10 yet? compare our counter with decimal 10
                                 jne     nextNumber      ; jump if not equal and keep counting
-                                  
-                                call    quit                                        
+
+                                call    quit
                             </pre>
                             <div class="output">
                                 <div class="inner">
@@ -1030,10 +1061,10 @@
                             <span class="label label-important">Error:</span>
                             Our number 10 prints a colon (:) character instead.  What's going on?
                         </p>
-                        
+
                     </article>
                 </div>
-                
+
                 <hr>
 
                 <div class="row-fluid" id="lesson11">
@@ -1050,7 +1081,7 @@
                         <h5>How does the divide instruction work?</h5>
 
                         <p>The DIV and IDIV instructions work by dividing whatever is in EAX by the value passed to the instruction.  The quotient part of the value is left in EAX and the remainder part is put into EDX (Originally called the data register).
-                        
+
                         <p>For example.</p>
 
                         <div class="snippet">
@@ -1071,7 +1102,7 @@
                             <span class="label label-info">Note:</span>
                             Only the new functions iprint and iprintLF have comments.
                         </p>
-                        
+
                         <div class="snippet">
                             <span class="filename">functions.asm</span>
                             <pre class="brush: asm;">
@@ -1084,7 +1115,7 @@
                                 push    edx             ; preserve edx on the stack to be restored after function runs
                                 push    esi             ; preserve esi on the stack to be restored after function runs
                                 mov     ecx, 0          ; counter of how many bytes we need to print in the end
-                                
+
                             divideLoop:
                                 inc     ecx             ; count each byte to print - number of characters
                                 mov     edx, 0          ; empty edx
@@ -1125,24 +1156,24 @@
                                 pop     eax             ; restore the original value of eax before our function was called
                                 ret
 
-                                
+
                             ;------------------------------------------
                             ; int slen(String message)
                             ; String length calculation function
-                            slen:                     
-                                push    ebx             
-                                mov     ebx, eax        
-                                
-                            nextchar:                   
-                                cmp     byte [eax], 0   
-                                jz      finished        
-                                inc     eax             
-                                jmp     nextchar        
-                                
+                            slen:
+                                push    ebx
+                                mov     ebx, eax
+
+                            nextchar:
+                                cmp     byte [eax], 0
+                                jz      finished
+                                inc     eax
+                                jmp     nextchar
+
                             finished:
                                 sub     eax, ebx
-                                pop     ebx             
-                                ret                     
+                                pop     ebx
+                                ret
 
 
                             ;------------------------------------------
@@ -1154,10 +1185,10 @@
                                 push    ebx
                                 push    eax
                                 call    slen
-                                
+
                                 mov     edx, eax
                                 pop     eax
-                                
+
                                 mov     ecx, eax
                                 mov     ebx, 1
                                 mov     eax, 4
@@ -1184,17 +1215,17 @@
                                 pop     eax
                                 ret
 
-                                
+
                             ;------------------------------------------
                             ; void exit()
                             ; Exit program and restore resources
                             quit:
-                                mov     ebx, 0      
-                                mov     eax, 1      
+                                mov     ebx, 0
+                                mov     eax, 1
                                 int     80h
                                 ret
 
-                               
+
                             </pre>
                         </div>
 
@@ -1210,19 +1241,19 @@
 
                             SECTION .text
                             global  _start
-                                
-                            _start: 
+
+                            _start:
 
                                 mov     ecx, 0
-                                
+
                             nextNumber:
                                 inc     ecx
                                 mov     eax, ecx
                                 call    iprintLF        ; NOTE call our new integer printing function (itoa)
                                 cmp     ecx, 10
                                 jne     nextNumber
-                                  
-                                call    quit                                    
+
+                                call    quit
                             </pre>
                             <div class="output">
                                 <div class="inner">
@@ -1242,10 +1273,193 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                     </article>
                 </div>
-                                                
+
+                <hr>
+
+                <div class="row-fluid" id="lesson12">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 12</h2>
+                            <h4>Calculator - addition</h4>
+                        </header>
+
+                        <div class="snippet">
+                            <span class="filename">calculator-addition.asm</span>
+                            <pre class="brush: asm;">
+                            ; Calculator (Addition)
+                            ; Compile with: nasm -f elf calculator-addition.asm
+                            ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 calculator-addition.o -o calculator-addition
+                            ; Run with: ./calculator-addition
+
+                            %include        'functions.asm'
+
+                            SECTION .text
+                            global  _start
+
+                            _start:
+
+                                mov     eax, 90     ; move our first number into eax
+                                mov     ebx, 9      ; move our second number into ebx
+                                add     eax, ebx    ; add ebx to eax
+                                call    iprintLF    ; call our integer print with linefeed function
+
+                                call    quit
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf calculator-addition.asm</span>
+                                    <span>~$ ld -m elf_i386 calculator-addition.o -o calculator-addition</span>
+                                    <span>~$ ./calculator-addition</span>
+                                    <span>99</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </article>
+                </div>
+
+                <hr>
+
+                <div class="row-fluid" id="lesson13">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 13</h2>
+                            <h4>Calculator - subtraction</h4>
+                        </header>
+
+                        <div class="snippet">
+                            <span class="filename">calculator-subtraction.asm</span>
+                            <pre class="brush: asm;">
+                            ; Calculator (Subtraction)
+                            ; Compile with: nasm -f elf calculator-subtraction.asm
+                            ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 calculator-subtraction.o -o calculator-subtraction
+                            ; Run with: ./calculator-subtraction
+
+                            %include        'functions.asm'
+
+                            SECTION .text
+                            global  _start
+
+                            _start:
+
+                                mov     eax, 90     ; move our first number into eax
+                                mov     ebx, 9      ; move our second number into ebx
+                                sub     eax, ebx    ; subtract ebx from eax
+                                call    iprintLF    ; call our integer print with linefeed function
+
+                                call    quit
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf calculator-subtraction.asm</span>
+                                    <span>~$ ld -m elf_i386 calculator-subtraction.o -o calculator-subtraction</span>
+                                    <span>~$ ./calculator-subtraction</span>
+                                    <span>81</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </article>
+                </div>
+
+                <hr>
+
+                <div class="row-fluid" id="lesson14">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 14</h2>
+                            <h4>Calculator - multiplication</h4>
+                        </header>
+
+                        <div class="snippet">
+                            <span class="filename">calculator-multiplication.asm</span>
+                            <pre class="brush: asm;">
+                            ; Calculator (Multiplication)
+                            ; Compile with: nasm -f elf calculator-multiplication.asm
+                            ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 calculator-multiplication.o -o calculator-multiplication
+                            ; Run with: ./calculator-multiplication
+
+                            %include        'functions.asm'
+
+                            SECTION .text
+                            global  _start
+
+                            _start:
+
+                                mov     eax, 90     ; move our first number into eax
+                                mov     ebx, 9      ; move our second number into ebx
+                                mul     ebx         ; multiply eax by ebx
+                                call    iprintLF    ; call our integer print with linefeed function
+
+                                call    quit
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf calculator-multiplication.asm</span>
+                                    <span>~$ ld -m elf_i386 calculator-multiplication.o -o calculator-multiplication</span>
+                                    <span>~$ ./calculator-multiplication</span>
+                                    <span>810</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </article>
+                </div>
+
+                <hr>
+
+                <div class="row-fluid" id="lesson15">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 15</h2>
+                            <h4>Calculator - division</h4>
+                        </header>
+
+                        <div class="snippet">
+                            <span class="filename">calculator-division.asm</span>
+                            <pre class="brush: asm;">
+                            ; Calculator (Division)
+                            ; Compile with: nasm -f elf calculator-division.asm
+                            ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 calculator-division.o -o calculator-division
+                            ; Run with: ./calculator-division
+
+                            %include        'functions.asm'
+
+                            SECTION .data
+                            msg1        db      ' remainder '      ; a message string to correctly output result
+
+                            SECTION .text
+                            global  _start
+
+                            _start:
+
+                                mov     eax, 90     ; move our first number into eax
+                                mov     ebx, 9      ; move our second number into ebx
+                                div     ebx         ; divide eax by ebx
+                                call    iprint      ; call our integer print function on the quotient
+                                mov     eax, msg1   ; move our message string into eax
+                                call    sprint      ; call our string print function
+                                mov     eax, edx    ; move our remainder into eax
+                                call    iprintLF    ; call out integer printing with linefeed function
+
+                                call    quit
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf calculator-division.asm</span>
+                                    <span>~$ ld -m elf_i386 calculator-division.o -o calculator-division</span>
+                                    <span>~$ ./calculator-division</span>
+                                    <span>10 remainder 0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </article>
+                </div>
+
             </div>
         </div>
 
@@ -1256,11 +1470,11 @@
         </footer>
 
     </div>
-    
+
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
     <script src="./assets/bootstrap/js/bootstrap.min.js"></script>
     <script src="./assets/script.js"></script>
-    
+
   </body>
 </html>
 
