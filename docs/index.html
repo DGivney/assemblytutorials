@@ -179,7 +179,7 @@
                     <div class="span4">
                         <h2>Lesson 15</h2>
                         <h5>Calculator - division</h5>
-                        <p>Introduction to calulating numbers in assembly.  This tutorial describes a simple program to divide one number from another.</p>
+                        <p>Introduction to calulating numbers in assembly.  This tutorial describes a simple program to divide one number by another.</p>
                         <p><a class="btn" href="#lesson15">View lesson &raquo;</a></p>
                     </div>
                 </div>
@@ -1286,6 +1286,8 @@
                             <h4>Calculator - addition</h4>
                         </header>
 
+                        <p>In this program we will be adding the registers EAX and EBX together and we'll leave our answer in EAX. Firstly we use the MOV instruction to load EAX with an integer (in this case 90).  We then MOV an integer into EBX (in this case 9).  Now all we need to do is use the ADD instruction to perform our addition. EBX & EAX will be added together leaving our answer in the left most register in this instruction (in our case EAX). Then all we need to do is call our integer printing function to complete the program.</p>
+
                         <div class="snippet">
                             <span class="filename">calculator-addition.asm</span>
                             <pre class="brush: asm;">
@@ -1329,7 +1331,7 @@
                             <h2>Lesson 13</h2>
                             <h4>Calculator - subtraction</h4>
                         </header>
-
+                        <p>In this program we will be subtracting the value in the register EBX from the value in the register EAX.  Firstly we load EAX and EBX with integers in the same way as Lesson 12.  The only difference is we will be using the SUB instruction to perform our subtraction logic, leaving our answer in the left most register of this instruction (in our case EAX). Then all we need to do is call our integer printing function to complete the program.</p>
                         <div class="snippet">
                             <span class="filename">calculator-subtraction.asm</span>
                             <pre class="brush: asm;">
@@ -1374,6 +1376,8 @@
                             <h4>Calculator - multiplication</h4>
                         </header>
 
+                        <p>In this program we will be multiplying the value in EBX by the value present in EAX.  Firstly we load EAX and EBX with integers in the same way as Lesson 12.  This time though we will be calling the MUL instruction to perform our multiplication logic.  The MUL instruction is different from many instructions in NASM, in that it only accepts one further argument.  The MUL instruction always multiples EAX by whatever value is passed after it.  The answer is left in EAX.</p>
+
                         <div class="snippet">
                             <span class="filename">calculator-multiplication.asm</span>
                             <pre class="brush: asm;">
@@ -1417,6 +1421,10 @@
                             <h2>Lesson 15</h2>
                             <h4>Calculator - division</h4>
                         </header>
+
+                        <p>In this program we will be dividing the value in EBX by the value present in EAX.  We've used division before in our integer print subroutine. Our program requires a few extra strings in order to print out the correct answer but otherwise there's nothing complicated going on.</p>
+
+                        <p>Firstly we load EAX and EBX with integers in the same way as Lesson 12.  Division logic is performed using the DIV instruction.  The DIV instruction always divides EAX by the value passed after it.  It will leave the quotient part of the answer in EAX and put the remainder part in EDX (the original data register).  We then MOV and call our strings and integers to print out the correct answer.</p>
 
                         <div class="snippet">
                             <span class="filename">calculator-division.asm</span>
