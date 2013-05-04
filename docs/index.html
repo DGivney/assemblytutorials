@@ -68,6 +68,8 @@
                         <li><a href="#lesson14">Lesson 14 <span>Calculator - multiplication</span></a></li>
                         <li><a href="#lesson15">Lesson 15 <span>Calculator - division</span></a></li>
                         <li><a href="#lesson16">Lesson 16 <span>Calculator (atoi)</span></a></li>
+                        <li><a href="#lesson17">Lesson 17 <span>Local labels</span></a></li>
+                        <li><a href="#lesson18">Lesson 18 <span>Fizz Buzz</span></a></li>
                     </ul>
                 </div>
             </div>
@@ -191,6 +193,18 @@
                         <h5>Calculator (atoi)</h5>
                         <p>This program takes a series of passed string arguments, converts them to integers and adds them all together.</p>
                         <p><a class="btn" href="#lesson16">View lesson &raquo;</a></p>
+                    </div>
+                    <div class="span4">
+                        <h2>Lesson 17</h2>
+                        <h5>Local labels</h5>
+                        <p>Introduction to how NASM handles namespace when it comes to global and local labels.</p>
+                        <p><a class="btn" href="#lesson17">View lesson &raquo;</a></p>
+                    </div>
+                    <div class="span4">
+                        <h2>Lesson 18</h2>
+                        <h5>Fizz Buzz</h5>
+                        <p>The Fizz Buzz programming challenge recreated in NASM.</p>
+                        <p><a class="btn" href="#lesson18">View lesson &raquo;</a></p>
                     </div>
                 </div>
 
@@ -1575,6 +1589,76 @@
                                     <span>~$ ld -m elf_i386 calculator-atoi.o -o calculator-atoi</span>
                                     <span>~$ ./calculator-atoi 20 1000 317</span>
                                     <span>1337</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </article>
+                </div>
+
+                <hr>
+
+                <div class="row-fluid" id="lesson17">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 17</h2>
+                            <h4>Local labels</h4>
+                        </header>
+
+                        <div class="snippet">
+                            <span class="filename">namespace.asm</span>
+                            <pre class="brush: asm;">
+
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf namespace.asm</span>
+                                    <span>~$ ld -m elf_i386 namespace.o -o namespace</span>
+                                    <span>~$ ./namespace</span>
+                                    <span></span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </article>
+                </div>
+
+                <hr>
+
+                <div class="row-fluid" id="lesson18">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 18</h2>
+                            <h4>Fizz Buzz</h4>
+                        </header>
+
+                        <div class="snippet">
+                            <span class="filename">fizzbuzz.asm</span>
+                            <pre class="brush: asm;">
+
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf fizzbuzz.asm</span>
+                                    <span>~$ ld -m elf_i386 fizzbuzz.o -o fizzbuzz</span>
+                                    <span>~$ ./fizzbuzz</span>
+                                    <span>1</span>
+                                    <span>2</span>
+                                    <span>Fizz</span>
+                                    <span>4</span>
+                                    <span>Buzz</span>
+                                    <span>Fizz</span>
+                                    <span>7</span>
+                                    <span>8</span>
+                                    <span>Fizz</span>
+                                    <span>Buzz</span>
+                                    <span>11</span>
+                                    <span>Fizz</span>
+                                    <span>13</span>
+                                    <span>14</span>
+                                    <span>FizzBuzz</span>
+                                    <span>16</span>
+                                    <span>...</span>
                                 </div>
                             </div>
                         </div>
