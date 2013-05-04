@@ -1487,6 +1487,11 @@
                             <h4>Calculator (atoi)</h4>
                         </header>
 
+                        <p>
+                            <span class="label label-info">Note:</span>
+                            Only the new function in this file 'atoi' is shown below.
+                        </p>
+
                         <div class="snippet">
                             <span class="filename">functions.asm</span>
                             <pre class="brush: asm;">
@@ -1568,7 +1573,7 @@
                                 <div class="inner">
                                     <span>~$ nasm -f elf calculator-atoi.asm</span>
                                     <span>~$ ld -m elf_i386 calculator-atoi.o -o calculator-atoi</span>
-                                    <span>~$ ./calculator-atoi</span>
+                                    <span>~$ ./calculator-atoi 20 1000 317</span>
                                     <span>1337</span>
                                 </div>
                             </div>
