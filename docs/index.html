@@ -67,6 +67,7 @@
                         <li><a href="#lesson13">Lesson 13 <span>Calculator - subtraction</span></a></li>
                         <li><a href="#lesson14">Lesson 14 <span>Calculator - multiplication</span></a></li>
                         <li><a href="#lesson15">Lesson 15 <span>Calculator - division</span></a></li>
+                        <li><a href="#lesson16">Lesson 16 <span>Calculator (atoi)</span></a></li>
                     </ul>
                 </div>
             </div>
@@ -181,6 +182,15 @@
                         <h5>Calculator - division</h5>
                         <p>Introduction to calulating numbers in assembly.  This tutorial describes a simple program to divide one number by another.</p>
                         <p><a class="btn" href="#lesson15">View lesson &raquo;</a></p>
+                    </div>
+                </div>
+
+                <div class="row-fluid">
+                    <div class="span4">
+                        <h2>Lesson 16</h2>
+                        <h5>Calculator (atoi)</h5>
+                        <p>This program takes a series of passed string arguments, converts them to integers and adds them all together.</p>
+                        <p><a class="btn" href="#lesson16">View lesson &raquo;</a></p>
                     </div>
                 </div>
 
@@ -1461,6 +1471,105 @@
                                     <span>~$ ld -m elf_i386 calculator-division.o -o calculator-division</span>
                                     <span>~$ ./calculator-division</span>
                                     <span>10 remainder 0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </article>
+                </div>
+
+                <hr>
+
+                <div class="row-fluid" id="lesson16">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 16</h2>
+                            <h4>Calculator (atoi)</h4>
+                        </header>
+
+                        <div class="snippet">
+                            <span class="filename">functions.asm</span>
+                            <pre class="brush: asm;">
+                            ;------------------------------------------
+                            ; int atoi(Integer number)
+                            ; Ascii to integer function (atoi)
+                            atoi:
+                                push    ebx             ; preserve ebx on the stack to be restored after function runs
+                                push    ecx             ; preserve ecx on the stack to be restored after function runs
+                                push    edx             ; preserve edx on the stack to be restored after function runs
+                                push    esi             ; preserve esi on the stack to be restored after function runs
+                                mov     esi, eax        ; move pointer in eax into esi (our number to convert)
+                                mov     eax, 0          ; initialise eax with decimal value 0
+                                mov     ecx, 0          ; initialise ecx with decimal value 0
+
+                            .multiplyLoop:
+                                xor     ebx, ebx        ; resets both lower and uppper bytes of ebx to be 0
+                                mov     bl, [esi+ecx]   ; move a single byte into ebx register's lower half
+                                cmp     bl, 48          ; compare ebx register's lower half value against ascii value 48 (char value 0)
+                                jl      .finished       ; jump if less than to label finished
+                                cmp     bl, 57          ; compare ebx register's lower half value against ascii value 57 (char value 9)
+                                jg      .finished       ; jump if greater than to label finished
+                                cmp     bl, 10          ; compare ebx register's lower half value against ascii value 10 (linefeed character)
+                                je      .finished       ; jump if equal to label finished
+                                cmp     bl, 0           ; compare ebx register's lower half value against decimal value 0 (end of string)
+                                jz      .finished       ; jump if zero to label finished
+
+                                sub     bl, 48          ; convert ebx register's lower half to decimal representation of ascii value
+                                add     eax, ebx        ; add ebx to our interger value in eax
+                                mov     ebx, 10         ; move decimal value 10 into ebx
+                                mul     ebx             ; multiply eax by ebx to get place value
+                                inc     ecx             ; increment ecx (our counter register)
+                                jmp     .multiplyLoop   ; continue multiply loop
+
+                            .finished:
+                                mov     ebx, 10         ; move decimal value 10 into ebx
+                                div     ebx             ; divide eax by value in ebx (in this case 10)
+                                pop     esi             ; restore esi from the value we pushed onto the stack at the start
+                                pop     edx             ; restore edx from the value we pushed onto the stack at the start
+                                pop     ecx             ; restore ecx from the value we pushed onto the stack at the start
+                                pop     ebx             ; restore ebx from the value we pushed onto the stack at the start
+                                ret
+                            </pre>
+                        </div>
+
+                        <div class="snippet">
+                            <span class="filename">calculator-atoi.asm</span>
+                            <pre class="brush: asm;">
+                            ; Calculator (ATOI)
+                            ; Compile with: nasm -f elf calculator-atoi.asm
+                            ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 calculator-atoi.o -o calculator-atoi
+                            ; Run with: ./calculator-atoi 20 1000 317
+
+                            %include        'functions.asm'
+
+                            SECTION .text
+                            global  _start
+
+                            _start:
+
+                                pop     ecx             ; first value on the stack is the number of arguments
+                                mov     edx, 0          ; initialise our data register to store additions
+
+                            nextArg:
+                                cmp     ecx, 0h         ; check to see if we have any arguments left
+                                jz      noMoreArgs      ; if zero flag is set jump to noMoreArgs label (jumping over the end of the loop)
+                                pop     eax             ; pop the next argument off the stack
+                                call    atoi            ; convert our ascii string to decimal integer
+                                add     edx, eax        ; perform our addition logic
+                                dec     ecx             ; decrease ecx (number of arguments left) by 1
+                                jmp     nextArg         ; jump to nextArg label
+
+                            noMoreArgs:
+                                mov     eax, edx        ; move our data result into eax for printing
+                                call    iprintLF        ; call our integer printing with linefeed function
+                                call    quit            ; call our quit function
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf calculator-atoi.asm</span>
+                                    <span>~$ ld -m elf_i386 calculator-atoi.o -o calculator-atoi</span>
+                                    <span>~$ ./calculator-atoi</span>
+                                    <span>1337</span>
                                 </div>
                             </div>
                         </div>
