@@ -12,17 +12,17 @@ atoi:
 
 .multiplyLoop:
     xor     ebx, ebx        ; resets both lower and uppper bytes of ebx to be 0
-    mov     bl, [esi+ecx]   ; move a single byte into ebx register lower half
-    cmp     bl, 48          ; compare ebx registers lower half value against ascii value 48 (char value 0)
+    mov     bl, [esi+ecx]   ; move a single byte into ebx register's lower half
+    cmp     bl, 48          ; compare ebx register's lower half value against ascii value 48 (char value 0)
     jl      .finished       ; jump if less than to label finished
-    cmp     bl, 57          ; compare ebx registers lower half value against ascii value 57 (char value 9)
+    cmp     bl, 57          ; compare ebx register's lower half value against ascii value 57 (char value 9)
     jg      .finished       ; jump if greater than to label finished
-    cmp     bl, 10          ; compare ebx registers lower half value against ascii value 10 (linefeed character)
+    cmp     bl, 10          ; compare ebx register's lower half value against ascii value 10 (linefeed character)
     je      .finished       ; jump if equal to label finished
-    cmp     bl, 0           ; compare ebx registers lower half value against decimal value 0 (end of string)
+    cmp     bl, 0           ; compare ebx register's lower half value against decimal value 0 (end of string)
     jz      .finished       ; jump if zero to label finished
 
-    sub     bl, 48          ; convert ebx registers lower half to decimal representation of ascii value
+    sub     bl, 48          ; convert ebx register's lower half to decimal representation of ascii value
     add     eax, ebx        ; add ebx to our interger value in eax
     mov     ebx, 10         ; move decimal value 10 into ebx
     mul     ebx             ; multiply eax by ebx to get place value
