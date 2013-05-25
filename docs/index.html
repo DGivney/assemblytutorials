@@ -1605,10 +1605,62 @@
                             <h4>Namespace</h4>
                         </header>
 
+                        <p>Namespace is a necessary construct in any software project that involves a codebase that is larger than a few simple functions.  Namespace provides scope to your identifiers and allows you to reuse naming conventions to make your code more readable and maintainable.  In assembly language where subroutines are identified by global labels, namespace can be achieved by using local labels.</p>
+
+                        <p>Up until the last few tutorials we have been using global labels exclusively.  This means that blocks of logic that essentially perform the same task needed a label with a unique identifier.  A good example would be our “finished” labels.  These were global in scope meaning when we needed to break out of a loop in one function we could jump to a “finished” label.  But if we needed to break out of a loop in a different function we would need to name this same task something else maybe calling it “done” or “continue”. Being able to reuse the label “finished” would mean that someone reading the code would know that these blocks of logic perform almost the same task.</p>
+
+                        <p>Local labels are prepended with a “.” at the beginning of their name for example “.finished”. You may have noticed them appearing as our code base in functions.asm grew.  A local label is given the namespace of the first global label above it. You can jump to a local label by using the JMP instruction and the compiler will calculate which local label you are referencing by determining in what scope (based on the above global labels) the instruction was called.</p>
+
                         <div class="snippet">
                             <span class="filename">namespace.asm</span>
                             <pre class="brush: asm;">
+                            ; Namespace
+                            ; Compile with: nasm -f elf namespace.asm
+                            ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 namespace.o -o namespace
+                            ; Run with: ./namespace
 
+                            %include        'functions.asm'
+
+                            SECTION .data
+                            msg1        db      'Jumping to finished label.', 0h        ; a message string
+                            msg2        db      'Inside subroutine number: ', 0h        ; a message string
+                            msg3        db      'Inside subroutine "finished".', 0h     ; a message string
+
+                            SECTION .text
+                            global  _start
+
+                            _start:
+
+                            subrountineOne:
+                                mov     eax, msg1       ; move the address of msg1 into eax
+                                call    sprintLF        ; call our string printing with linefeed function
+                                jmp     .finished       ; jump to the local label under the subrountineOne scope
+
+                            .finished:
+                                mov     eax, msg2       ; move the address of msg2 into eax
+                                call    sprint          ; call our string printing function
+                                mov     eax, 1          ; move the value one into eax (for subroutine number one)
+                                call    iprintLF        ; call our integer printing function with linefeed function
+
+                            subrountineTwo:
+                                mov     eax, msg1       ; move the address of msg1 into eax
+                                call    sprintLF        ; call our string print with linefeed function
+                                jmp     .finished       ; jump to the local label under the subrountineTwo scope
+
+                            .finished:
+                                mov     eax, msg2       ; move the address of msg2 into eax
+                                call    sprint          ; call our string printing function
+                                mov     eax, 2          ; move the value two into eax (for subroutine number two)
+                                call    iprintLF        ; call our integer printing function with linefeed function
+
+                                mov     eax, msg1       ; move the address of msg1 into eax
+                                call    sprintLF        ; call our string printing with linefeed function
+                                jmp     finished        ; jump to the global label finished
+
+                            finished:
+                                mov     eax, msg3       ; move the address of msg3 into eax
+                                call    sprintLF        ; call our string printing with linefeed function
+                                call    quit            ; call our quit function
                             </pre>
                             <div class="output">
                                 <div class="inner">
