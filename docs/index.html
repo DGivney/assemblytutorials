@@ -68,7 +68,7 @@
                         <li><a href="#lesson14">Lesson 14 <span>Calculator - multiplication</span></a></li>
                         <li><a href="#lesson15">Lesson 15 <span>Calculator - division</span></a></li>
                         <li><a href="#lesson16">Lesson 16 <span>Calculator (atoi)</span></a></li>
-                        <li><a href="#lesson17">Lesson 17 <span>Local labels</span></a></li>
+                        <li><a href="#lesson17">Lesson 17 <span>Namespace</span></a></li>
                         <li><a href="#lesson18">Lesson 18 <span>Fizz Buzz</span></a></li>
                     </ul>
                 </div>
@@ -196,7 +196,7 @@
                     </div>
                     <div class="span4">
                         <h2>Lesson 17</h2>
-                        <h5>Local labels</h5>
+                        <h5>Namespace</h5>
                         <p>Introduction to how NASM handles namespace when it comes to global and local labels.</p>
                         <p><a class="btn" href="#lesson17">View lesson &raquo;</a></p>
                     </div>
@@ -1602,7 +1602,7 @@
                     <article class="span12">
                         <header>
                             <h2>Lesson 17</h2>
-                            <h4>Local labels</h4>
+                            <h4>Namespace</h4>
                         </header>
 
                         <div class="snippet">
@@ -1632,10 +1632,80 @@
                             <h4>Fizz Buzz</h4>
                         </header>
 
+                        <h5>Firstly, some background</h5>
+
+                        <p>FizzBuzz is group word game played in schools to teach children division.  Players take turns to count aloud integers from 1 to 100 replacing any number divisible by 3 with the word “fizz” and any number divisible by 5 with the word “buzz”.  Numbers that are both divisible by 3 and 5 are replaced by the word “fizzbuzz”.  This children's game has also become a defacto interview screening question for computer programming jobs as it's thought to easily discover candidates that can't construct a simple logic gate.</p>
+
+                        <h5>Writing our program</h5>
+
+                        <p>There are a number of code solutions to this simple game and some languages offer very trivial and elegant solutions.  Depending on how you choose to solve it, the solution almost always involves an if statement and possibly an else statement depending whether you choose to exploit the mathematical property that anything divisible by 5 & 3 would also be divisible by 3 * 5.  Being that this is an assembly language tutorial we will provide a solution that involves a structure of two cascading if statements to print the words “fizz” and/or “buzz” and an else statement in case these fail to print the integer as an ascii value.  Each iteration of our loop will then print a line feed. Once we reach 100 we call our program exit function.</p>
+
                         <div class="snippet">
                             <span class="filename">fizzbuzz.asm</span>
                             <pre class="brush: asm;">
+                            ; Fizzbuzz
+                            ; Compile with: nasm -f elf fizzbuzz.asm
+                            ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 fizzbuzz.o -o fizzbuzz
+                            ; Run with: ./fizzbuzz
 
+                            %include        'functions.asm'
+
+                            SECTION .data
+                            fizz        db      'Fizz', 0h     ; a message string
+                            buzz        db      'Buzz', 0h     ; a message string
+
+                            SECTION .text
+                            global  _start
+
+                            _start:
+
+                                mov     esi, 0          ; initialise our checkFizz boolean variable
+                                mov     edi, 0          ; initialise our checkBuzz boolean variable
+                                mov     ecx, 0          ; initialise our counter variable
+
+                            nextNumber:
+                                inc     ecx             ; increment our counter variable
+
+                            .checkFizz
+                                mov     edx, 0          ; clear the edx register - this will hold our remainder after division
+                                mov     eax, ecx        ; move the value of our counter into eax for division
+                                mov     ebx, 3          ; move our number to divide by into ebx (in this case the value is 3)
+                                div     ebx             ; divide eax by ebx
+                                mov     edi, edx        ; move our remainder into edi (our checkFizz boolean variable)
+                                cmp     edi, 0          ; compare if the remainder is zero (meaning the counter divides by 3)
+                                jne     .checkBuzz      ; if the remainder is not equal to zero jump to local label checkBuzz
+                                mov     eax, fizz       ; else move the address of our fizz string into eax for printing
+                                call    sprint          ; call our string printing function
+
+                            .checkBuzz:
+                                mov     edx, 0          ; clear the edx register - this will hold our remainder after division
+                                mov     eax, ecx        ; move the value of our counter into eax for division
+                                mov     ebx, 5          ; move our number to divide by into ebx (in this case the value is 5)
+                                div     ebx             ; divide eax by ebx
+                                mov     esi, edx        ; move our remainder into edi (our checkBuzz boolean variable)
+                                cmp     esi, 0          ; compare if the remainder is zero (meaning the counter divides by 5)
+                                jne     .checkInt       ; if the remainder is not equal to zero jump to local label checkInt
+                                mov     eax, buzz       ; else move the address of our buzz string into eax for printing
+                                call    sprint          ; call our string printing function
+
+                            .checkInt:
+                                cmp     edi, 0          ; edi contains the remainder after the division in checkFizz
+                                je     .continue        ; if equal (counter divides by 3) skip printing the integer
+                                cmp     esi, 0          ; esi contains the remainder after the division in checkBuzz
+                                je     .continue        ; if equal (counter divides by 5) skip printing the integer
+                                mov     eax, ecx        ; else move the value in ecx (our counter) into eax for printing
+                                call    iprint          ; call our integer printing function
+
+                            .continue:
+                                mov     eax, 0Ah        ; move an ascii linefeed character into eax
+                                push    eax             ; push the address of eax onto the stack for printing
+                                mov     eax, esp        ; get the stack pointer (address on the stack of our linefeed char)
+                                call    sprint          ; call our string printing function to print a line feed
+                                pop     eax             ; pop the stack so we don't waste resources
+                                cmp     ecx, 100        ; compare if our counter is equal to 100
+                                jne     nextNumber      ; if not equal jump to the start of the loop
+
+                                call    quit            ; else call our quit function
                             </pre>
                             <div class="output">
                                 <div class="inner">
