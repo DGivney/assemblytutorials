@@ -1,7 +1,7 @@
 $(document).ready(function() {
 
     $('p, li').html(function(i, v) {
-        return v.replace(/\s(EAX|EBX|ECX|EDX|EBP|ESP|EDI|ESI){1}([^\s]*)/gi, ' <span class="register-name">$1$2</span>');
+        return v.replace(/\s(EAX|EBX|ECX|EDX|EBP|ESP|EDI|ESI|BX|BL|BH){1}([^\s]*)/gi, ' <span class="register-name">$1$2</span>');
     }).html(function(i, v) {
         return v.replace(/(SYS_)([^\s]*)/gi, '<span class="function-name">$1$2</span>');
     }).html(function(i, v) {
