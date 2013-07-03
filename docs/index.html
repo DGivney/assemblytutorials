@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>NASM Assembly Tutorials - asmtutor.com</title>
+    <title>NASM Assembly Language Tutorials - asmtutor.com</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -35,7 +35,7 @@
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="navbar-inner">
             <div class="container-fluid">
-                <span class="brand">NASM Assembly Tutorials - asmtutor.com</span>
+                <span class="brand">NASM Assembly Language Tutorials - asmtutor.com</span>
                 <div class="nav-collapse collapse">
                     <p class="navbar-text pull-right">
                         <a class="navbar-link" href="#top">Top</a>
@@ -70,6 +70,8 @@
                         <li><a href="#lesson16">Lesson 16 <span>Calculator (atoi)</span></a></li>
                         <li><a href="#lesson17">Lesson 17 <span>Namespace</span></a></li>
                         <li><a href="#lesson18">Lesson 18 <span>Fizz Buzz</span></a></li>
+                        <li><a href="#lesson19">Lesson 19 <span>Execute Command</span></a></li>
+                        <li><a href="#lesson20">Lesson 20 <span>Process Forking</span></a></li>
                     </ul>
                 </div>
             </div>
@@ -77,7 +79,7 @@
             <div class="span9 lessons">
 
                 <div class="hero-unit">
-                    <h2>Learn Assembly</h2>
+                    <h2>Learn Assembly Language</h2>
                     <p>This project was put together to teach myself NASM 64bit assembly language on linux.</p>
                     <p><a href="https://github.com/DGivney/assemblytutorials" class="btn btn-primary btn" target="_blank">Github Project &raquo;</a></p>
                 </div>
@@ -205,6 +207,21 @@
                         <h5>Fizz Buzz</h5>
                         <p>The Fizz Buzz programming challenge recreated in NASM.</p>
                         <p><a class="btn" href="#lesson18">View lesson &raquo;</a></p>
+                    </div>
+                </div>
+
+                <div class="row-fluid hidden-phone">
+                    <div class="span4">
+                        <h2>Lesson 19</h2>
+                        <h5>Execute Command</h5>
+                        <p>In this lesson we replace the currently running process with a new process that executes a command.</p>
+                        <p><a class="btn" href="#lesson19">View lesson &raquo;</a></p>
+                    </div>
+                    <div class="span4">
+                        <h2>Lesson 20</h2>
+                        <h5>Process Forking</h5>
+                        <p>In this lesson we create a new process that duplicates our current process.</p>
+                        <p><a class="btn" href="#lesson20">View lesson &raquo;</a></p>
                     </div>
                 </div>
 
@@ -1808,6 +1825,174 @@
                                     <span>FizzBuzz</span>
                                     <span>16</span>
                                     <span>...</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </article>
+                </div>
+
+                <hr>
+
+                <div class="row-fluid" id="lesson19">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 19</h2>
+                            <h4>Execute Command</h4>
+                        </header>
+
+                        <h5>Firstly, some background</h5>
+
+                        <p>The EXEC family of functions replace the currently running process with a new process, that executes the command you specified when calling it.  We will be using the SYS_EXECVE function in this lesson to replace our program's running process with a new process that will execute the linux program /bin/echo to print out “Hello World!”.</p>
+
+                        <h5>Naming convention</h5>
+
+                        <p>The naming convention used for this family of functions is <strong>exec</strong> (execute) followed by one or more of the following letters.</p>
+
+                        <ul>
+                            <li><span class="instruction-name">e</span> - An array of pointers to environment variables is explicitly passed to the new process image.</li>
+                            <li><span class="instruction-name">l</span> - Command-line arguments are passed individually to the function.</li>
+                            <li><span class="instruction-name">p</span> - Uses the PATH environment variable to find the file named in the path argument to be executed.</li>
+                            <li><span class="instruction-name">v</span> - Command-line arguments are passed to the function as an array of pointers.</li>
+                        </ul>
+
+                        <h5>Writing our program</h5>
+
+                        <p>The <span class="instruction-name">V</span> &amp; <span class="instruction-name">E</span> at the end of our function name means we will need to pass our arguments in the following format:  The first argument is a string containing the command to execute, then an array of arguments to pass to that command and then another array of environment variables that the new process will use.  As we are calling a simple command we won't pass any special environment variables to the new process and instead will pass 0h (null).</p>
+
+                        <p>Both the command arguments and the environment arguments need to be passed as an array of pointers (addresses to memory).  That's why we define our strings first and then define a simple null-terminated struct (array) of the variables names.  This is then passed to SYS_EXECVE. We call the function and the process is replaced by our command and output is returned to the terminal.</p>
+
+                        <div class="snippet">
+                            <span class="filename">execute.asm</span>
+                            <pre class="brush: asm;">
+                            ; Execute
+                            ; Compile with: nasm -f elf execute.asm
+                            ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 execute.o -o execute
+                            ; Run with: ./execute
+
+                            %include        'functions.asm'
+
+                            SECTION .data
+                            command         db      '/bin/echo', 0h     ; command to execute
+                            arg1            db      'Hello World!', 0h
+                            arguments       dd      command
+                                            dd      arg1                ; arguments to pass to commandline (in this case just one)
+                                            dd      0h                  ; end the struct
+                            environment     dd      0h                  ; arguments to pass as environment variables (inthis case none) end the struct
+
+                            SECTION .text
+                            global  _start
+
+                            _start:
+
+                                mov     edx, environment    ; address of environment variables
+                                mov     ecx, arguments      ; address of the arguments to pass to the commandline
+                                mov     ebx, command        ; address of the file to execute
+                                mov     eax, 11             ; invoke SYS_EXECVE (kernel opcode 11)
+                                int     80h
+
+                                call    quit                ; call our quit function
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf execute.asm</span>
+                                    <span>~$ ld -m elf_i386 execute.o -o execute</span>
+                                    <span>~$ ./execute</span>
+                                    <span>Hello World!</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p>
+                            <span class="label label-info">Note:</span>
+                            Here are a couple other commands to try.
+                        </p>
+
+                        <div class="snippet">
+                            <span class="filename">execute.asm</span>
+                            <pre class="brush: asm; first-line: 8;">
+                            SECTION .data
+                            command         db      '/bin/ls', 0h       ; command to execute
+                            arg1            db      '-l', 0h
+                            </pre>
+                        </div>
+
+                        <div class="snippet">
+                            <span class="filename">execute.asm</span>
+                            <pre class="brush: asm; first-line: 8;">
+                            SECTION .data
+                            command         db      '/bin/sleep', 0h    ; command to execute
+                            arg1            db      '5', 0h
+                            </pre>
+                        </div>
+
+                    </article>
+                </div>
+
+                <hr>
+
+                <div class="row-fluid" id="lesson20">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 20</h2>
+                            <h4>Process Forking</h4>
+                        </header>
+
+                        <h5>Firstly, some background</h5>
+
+                        <p>In this lesson we will use SYS_FORK to create a new process that duplicates our current process.  SYS_FORK takes no arguments - you just call fork and the new process is created.  Both processes run concurrently. We can test the return value (in eax) to test whether we are currently in the parent or child process.  The parent process returns a non-negative, non-zero integer.  In the child process EAX is zero.  This can be used to branch your logic between the parent and child.</p>
+
+                        <p>In our program we exploit this fact to print out different messages in each process.</p>
+
+                        <p>
+                            <span class="label label-info">Note:</span>
+                            Each process is responsible for safely exiting.
+                        </p>
+
+                        <div class="snippet">
+                            <span class="filename">fork.asm</span>
+                            <pre class="brush: asm;">
+                            ; Fork
+                            ; Compile with: nasm -f elf fork.asm
+                            ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 fork.o -o fork
+                            ; Run with: ./fork
+
+                            %include        'functions.asm'
+
+                            SECTION .data
+                            childMsg        db      'This is the child process', 0h     ; a message string
+                            parentMsg       db      'This is the parent process', 0h    ; a message string
+
+                            SECTION .text
+                            global  _start
+
+                            _start:
+
+                                mov     eax, 2              ; invoke SYS_FORK (kernel opcode 2)
+                                int     80h
+
+                                cmp     eax, 0              ; if eax is zero we are in the child process
+                                jz      child               ; jump if eax is zero to child label
+
+                            parent:
+                                mov     eax, parentMsg      ; inside our parent process move parentMsg into eax
+                                call    sprintLF            ; call our string printing with linefeed function
+
+                                call    quit                ; quit the parent process
+
+                            child:
+                                mov     eax, childMsg       ; inside our child process move childMsg into eax
+                                call    sprintLF            ; call our string printing with linefeed function
+
+                                call    quit                ; quit the child process
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf fork.asm</span>
+                                    <span>~$ ld -m elf_i386 fork.o -o fork</span>
+                                    <span>~$ ./fork</span>
+                                    <span>This is the parent process</span>
+                                    <span>This is the child process</span>
                                 </div>
                             </div>
                         </div>
