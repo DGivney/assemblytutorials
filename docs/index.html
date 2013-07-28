@@ -72,6 +72,7 @@
                         <li><a href="#lesson18">Lesson 18 <span>Fizz Buzz</span></a></li>
                         <li><a href="#lesson19">Lesson 19 <span>Execute Command</span></a></li>
                         <li><a href="#lesson20">Lesson 20 <span>Process Forking</span></a></li>
+                        <li><a href="#lesson21">Lesson 21 <span>Telling the time</span></a></li>
                     </ul>
                 </div>
             </div>
@@ -222,6 +223,12 @@
                         <h5>Process Forking</h5>
                         <p>In this lesson we create a new process that duplicates our current process.</p>
                         <p><a class="btn" href="#lesson20">View lesson &raquo;</a></p>
+                    </div>
+                    <div class="span4">
+                        <h2>Lesson 21</h2>
+                        <h5>Telling the time</h5>
+                        <p>In this lesson we ask the kernel for the current unix timestamp.</p>
+                        <p><a class="btn" href="#lesson21">View lesson &raquo;</a></p>
                     </div>
                 </div>
 
@@ -1993,6 +2000,59 @@
                                     <span>~$ ./fork</span>
                                     <span>This is the parent process</span>
                                     <span>This is the child process</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </article>
+                </div>
+
+                <hr>
+
+                <div class="row-fluid" id="lesson21">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 21</h2>
+                            <h4>Telling the time</h4>
+                        </header>
+
+                        <p>Generating a unix timestamp in NASM is easy with the SYS_TIME function of the linux kernel.  Simple pass OPCODE 13 to the kernel with no arguments and you are returned the <a href="http://en.wikipedia.org/wiki/Unix_epoch">Unix Epoch</a> in the EAX register.</p>
+
+                        <p>That is the number of seconds that have elapsed since January 1st 1970 UTC.</p>
+
+                        <div class="snippet">
+                            <span class="filename">time.asm</span>
+                            <pre class="brush: asm;">
+                            ; Time
+                            ; Compile with: nasm -f elf time.asm
+                            ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 time.o -o time
+                            ; Run with: ./time
+
+                            %include        'functions.asm'
+
+                            SECTION .data
+                            msg        db      'Seconds since Jan 01 1970: ', 0h     ; a message string
+
+                            SECTION .text
+                            global  _start
+
+                            _start:
+
+                                mov     eax, msg        ; move our message string into eax for printing
+                                call    sprint          ; call our string printing function
+
+                                mov     eax, 13         ; invoke SYS_TIME (kernel opcode 13)
+                                int     80h             ; call the kernel
+
+                                call    iprintLF        ; call our integer printing function with linefeed
+                                call    quit            ; call our quit function
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf time.asm</span>
+                                    <span>~$ ld -m elf_i386 time.o -o time</span>
+                                    <span>~$ ./time</span>
+                                    <span>Seconds since Jan 01 1970: 1374995660</span>
                                 </div>
                             </div>
                         </div>

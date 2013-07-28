@@ -7,6 +7,7 @@ p { margin: 0 0 15px; }
 span.register-name { text-transform: uppercase; font-weight: 500; color: #808080; }
 span.instruction-name { text-transform: uppercase; font-weight: 500; color: #808080; }
 span.function-name { text-transform: lowercase; font-weight: 500; color: #808080; font-style: italic; }
+header + p { margin-top: 25px; }
 
 /* sidebar styles */
 .sidebar-nav { padding: 9px 0; background-color: #ffffff; }
