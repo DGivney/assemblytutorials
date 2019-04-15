@@ -254,7 +254,7 @@
 
                             <p>We can accomplish this all in assembly by loading EAX with the function number (operation code OPCODE) we want to execute and filling the remaining registers with the arguments we want to pass to the system call. A software interrupt is requested with the INT instruction and the kernel takes over and calls the function from the library with our arguments. Simple.</p>
 
-                            <p>For example requesting an interrupt when EAX=1 will call sys_exit and requesting an interrupt when EAX=4 will call sys_write instead. EBX, ECX & EDX will be passed as arguments if the function requires them. <a href="http://docs.cs.up.ac.za/programming/asm/derick_tut/syscalls.html" target="_blank">Click here to view an example of a Linux System Call Table and its corresponding OPCODES.</a></p>
+                            <p>For example requesting an interrupt when EAX=1 will call sys_exit and requesting an interrupt when EAX=4 will call sys_write instead. EBX, ECX & EDX will be passed as arguments if the function requires them. <a href="http://syscalls.kernelgrok.com/" target="_blank">Click here to view an example of a Linux System Call Table and its corresponding OPCODES.</a></p>
 
                             <h5>Writing our program</h5>
 
@@ -2016,7 +2016,7 @@
                             <h4>Telling the time</h4>
                         </header>
 
-                        <p>Generating a unix timestamp in NASM is easy with the SYS_TIME function of the linux kernel.  Simply pass OPCODE 13 to the kernel with no arguments and you are returned the <a href="http://en.wikipedia.org/wiki/Unix_epoch">Unix Epoch</a> in the EAX register.</p>
+                        <p>Generating a unix timestamp in NASM is easy with the SYS_TIME function of the linux kernel.  Simply pass OPCODE 13 to the kernel with no arguments and you are returned the <a href="https://en.wikipedia.org/wiki/Unix_epoch">Unix Epoch</a> in the EAX register.</p>
 
                         <p>That is the number of seconds that have elapsed since January 1st 1970 UTC.</p>
 
@@ -2066,7 +2066,7 @@
         <hr>
 
         <footer>
-            <p>Learn assembly language at <a href="http://asmtutor.com">http://asmtutor.com</a></p>
+            <p>Learn assembly language at <a href="https://asmtutor.com">https://asmtutor.com</a></p>
         </footer>
 
     </div>
