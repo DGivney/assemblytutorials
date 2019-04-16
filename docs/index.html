@@ -73,6 +73,13 @@
                         <li><a href="#lesson19">Lesson 19 <span>Execute Command</span></a></li>
                         <li><a href="#lesson20">Lesson 20 <span>Process Forking</span></a></li>
                         <li><a href="#lesson21">Lesson 21 <span>Telling the time</span></a></li>
+                        <li><a href="#lesson22">Lesson 22 <span>File Handling - Create</span></a></li>
+                        <li><a href="#lesson23">Lesson 23 <span>File Handling - Write</span></a></li>
+                        <li><a href="#lesson24">Lesson 24 <span>File Handling - Open</span></a></li>
+                        <li><a href="#lesson25">Lesson 25 <span>File Handling - Read</span></a></li>
+                        <li><a href="#lesson26">Lesson 26 <span>File Handling - Close</span></a></li>
+                        <li><a href="#lesson27">Lesson 27 <span>File Handling - Update</span></a></li>
+                        <li><a href="#lesson28">Lesson 28 <span>File Handling - Delete</span></a></li>
                     </ul>
                 </div>
             </div>
@@ -229,6 +236,57 @@
                         <h5>Telling the time</h5>
                         <p>In this lesson we ask the kernel for the current unix timestamp.</p>
                         <p><a class="btn" href="#lesson21">View lesson &raquo;</a></p>
+                    </div>
+                </div>
+
+                <div class="row-fluid hidden-phone">
+                    <div class="span4">
+                        <h2>Lesson 22</h2>
+                        <h5>File Handling - Create</h5>
+                        <p>In this lesson we learn how to create a new file in Assembly.</p>
+                        <p><a class="btn" href="#lesson22">View lesson &raquo;</a></p>
+                    </div>
+                    <div class="span4">
+                        <h2>Lesson 23</h2>
+                        <h5>File Handling - Write</h5>
+                        <p>In this lesson we write content to a newly created text file.</p>
+                        <p><a class="btn" href="#lesson23">View lesson &raquo;</a></p>
+                    </div>
+                    <div class="span4">
+                        <h2>Lesson 24</h2>
+                        <h5>File Handling - Open</h5>
+                        <p>In this lesson we open a text file and print it's file descriptor.</p>
+                        <p><a class="btn" href="#lesson24">View lesson &raquo;</a></p>
+                    </div>
+                </div>
+
+                <div class="row-fluid hidden-phone">
+                    <div class="span4">
+                        <h2>Lesson 25</h2>
+                        <h5>File Handling - Read</h5>
+                        <p>In this lesson we read content from a newly created text file.</p>
+                        <p><a class="btn" href="#lesson25">View lesson &raquo;</a></p>
+                    </div>
+                    <div class="span4">
+                        <h2>Lesson 26</h2>
+                        <h5>File Handling - Close</h5>
+                        <p>In this lesson we close a newly created text file using it's file descriptor.</p>
+                        <p><a class="btn" href="#lesson26">View lesson &raquo;</a></p>
+                    </div>
+                    <div class="span4">
+                        <h2>Lesson 27</h2>
+                        <h5>File Handling - Update</h5>
+                        <p>In this lesson we update the content of an included text file using seek.</p>
+                        <p><a class="btn" href="#lesson27">View lesson &raquo;</a></p>
+                    </div>
+                </div>
+
+                <div class="row-fluid hidden-phone">
+                    <div class="span4">
+                        <h2>Lesson 28</h2>
+                        <h5>File Handling - Delete</h5>
+                        <p>In this lesson we learn how to delete a file.</p>
+                        <p><a class="btn" href="#lesson28">View lesson &raquo;</a></p>
                     </div>
                 </div>
 
@@ -2053,6 +2111,550 @@
                                     <span>~$ ld -m elf_i386 time.o -o time</span>
                                     <span>~$ ./time</span>
                                     <span>Seconds since Jan 01 1970: 1374995660</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </article>
+                </div>
+
+                <hr>
+
+                <div class="row-fluid" id="lesson22">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 22</h2>
+                            <h4>File Handling - Create</h4>
+                        </header>
+
+                        <h5>Firstly, some background</h5>
+
+                        <p>File Handling in Linux is achieved through a small number of system calls related to creating, updating and deleting files. These functions require a <a href="https://en.wikipedia.org/wiki/File_descriptor" target="_blank">file descriptor</a> which is a unique, non-negative integer that identifies the file on the system.</p>
+
+                        <h5>Writing our program</h5>
+
+                        <p>We begin the tutorial by creating a file using sys_creat.  We will then build upon our program in each of the following file handling lessons, adding code as we go. Eventually we will have a full program that can create, update, open, close and delete files.</p>
+
+                        <p>sys_creat expects 2 arguments - the file permissions in ECX and the filename in EBX.  The sys_creat opcode is then loaded into EAX and the kernel is called to create the file. The file descriptor of the created file is returned in EAX. This file descriptor can then be used for all other file handling functions.</p>
+
+                        <div class="snippet">
+                            <span class="filename">create.asm</span>
+                            <pre class="brush: asm;">
+                                ; Create
+                                ; Compile with: nasm -f elf create.asm
+                                ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 create.o -o create
+                                ; Run with: ./create
+
+                                %include    'functions.asm'
+
+                                SECTION .data
+                                filename db 'readme.txt',       ; the filename to create
+
+                                SECTION .text
+                                global  _start
+
+                                _start:
+
+                                    mov     ecx, 0777           ; set all permissions to read, write, execute
+                                    mov     ebx, filename       ; filename we will create
+                                    mov     eax, 8              ; invoke SYS_CREAT (kernel opcode 8)
+                                    int     80h                 ; call the kernel
+
+                                    call    quit                ; call our quit function
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf create.asm</span>
+                                    <span>~$ ld -m elf_i386 create.o -o create</span>
+                                    <span>~$ ./create</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p>
+                            <span class="label label-info">Note:</span>
+                            The file 'readme.txt' will now have been created in the folder.
+                        </p>
+
+                    </article>
+                </div>
+
+                <hr>
+
+                <div class="row-fluid" id="lesson23">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 23</h2>
+                            <h4>File Handling - Write</h4>
+                        </header>
+
+                        <p>Building upon the previous lesson we will now use sys_write to write content to a newly created file.</p>
+
+                        <p>sys_write expects 3 arguments - the number of bytes to write in EDX, the contents string to write in ECX and the <a href="https://en.wikipedia.org/wiki/File_descriptor" target="_blank">file descriptor</a> in EBX.  The sys_write opcode is then loaded into EAX and the kernel is called to write the content to the file. In this lesson we will first call sys_creat to get a file descriptor which we will then load into EBX.</p>
+
+                        <div class="snippet">
+                            <span class="filename">write.asm</span>
+                            <pre class="brush: asm;">
+                                ; Write
+                                ; Compile with: nasm -f elf write.asm
+                                ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 write.o -o write
+                                ; Run with: ./write
+
+                                %include    'functions.asm'
+
+                                SECTION .data
+                                filename db 'readme.txt', 0h    ; the filename to create
+                                contents db 'Hello world!', 0h  ; the contents to write
+
+                                SECTION .text
+                                global  _start
+
+                                _start:
+
+                                    mov     ecx, 0777           ; code continues from lesson 22
+                                    mov     ebx, filename
+                                    mov     eax, 8
+                                    int     80h
+
+                                    mov     edx, 12             ; number of bytes to write - one for each letter of our contents string
+                                    mov     ecx, contents       ; move the memory address of our contents string into ecx
+                                    mov     ebx, eax            ; move the file descriptor of the file we created into ebx
+                                    mov     eax, 4              ; invoke SYS_WRITE (kernel opcode 4)
+                                    int     80h                 ; call the kernel
+
+                                    call    quit                ; call our quit function
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf write.asm</span>
+                                    <span>~$ ld -m elf_i386 write.o -o write</span>
+                                    <span>~$ ./write</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p>
+                            <span class="label label-info">Note:</span>
+                            Open the newly created file 'readme.txt' in this folder and you will see the content 'Hello world!'.
+                        </p>
+
+                    </article>
+                </div>
+
+                <hr>
+
+                <div class="row-fluid" id="lesson24">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 24</h2>
+                            <h4>File Handling - Open</h4>
+                        </header>
+
+                        <p>Building upon the previous lesson we will now use sys_open to obtain the <a href="https://en.wikipedia.org/wiki/File_descriptor" target="_blank">file descriptor</a> of the newly created file. This file descriptor can then be used for all other file handling functions.</p>
+
+                        <p>sys_open expects 2 arguments - the access mode (table below) in ECX and the filename in EBX.  The sys_open opcode is then loaded into EAX and the kernel is called to open the file and return the file descriptor.</p>
+
+                        <p>sys_open additionally accepts zero or more file creation flags and file status flags in EDX. <a href="http://man7.org/linux/man-pages/man2/open.2.html" target="_blank">Click here for more information about the access mode, file creation flags and file status flags</a>.</p>
+
+                        <div class="row-fluid">
+                            <div class="span6">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>Description</th>
+                                            <th>Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><b>O_RDONLY</b></td>
+                                            <td>open file in read only mode</td>
+                                            <td>0</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>O_WRONLY</b></td>
+                                            <td>open file in write only mode</td>
+                                            <td>1</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>O_RDWR</b></td>
+                                            <td>open file in read and write mode</td>
+                                            <td>2</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <p>
+                            <span class="label label-info">Note:</span>
+                            sys_open returns the file descriptor in EAX. On linux this will be a unique, non-negative integer which we will print using our integer printing function.
+                        </p>
+
+                        <div class="snippet">
+                            <span class="filename">open.asm</span>
+                            <pre class="brush: asm;">
+                                ; Open
+                                ; Compile with: nasm -f elf open.asm
+                                ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 open.o -o open
+                                ; Run with: ./open
+
+                                %include    'functions.asm'
+
+                                SECTION .data
+                                filename db 'readme.txt', 0h    ; the filename to create
+                                contents db 'Hello world!', 0h  ; the contents to write
+
+                                SECTION .text
+                                global  _start
+
+                                _start:
+
+                                    mov     ecx, 0777           ; Create file from lesson 22
+                                    mov     ebx, filename
+                                    mov     eax, 8
+                                    int     80h
+
+                                    mov     edx, 12             ; Write contents to file from lesson 23
+                                    mov     ecx, contents
+                                    mov     ebx, eax
+                                    mov     eax, 4
+                                    int     80h
+
+                                    mov     ecx, 0              ; flag for readonly access mode (O_RDONLY)
+                                    mov     ebx, filename       ; filename we created above
+                                    mov     eax, 5              ; invoke SYS_OPEN (kernel opcode 5)
+                                    int     80h                 ; call the kernel
+
+                                    call    iprintLF            ; call our integer printing function
+                                    call    quit                ; call our quit function
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf open.asm</span>
+                                    <span>~$ ld -m elf_i386 open.o -o open</span>
+                                    <span>~$ ./open</span>
+                                    <span>4</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </article>
+                </div>
+
+                <hr>
+
+                <div class="row-fluid" id="lesson25">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 25</h2>
+                            <h4>File Handling - Read</h4>
+                        </header>
+
+                        <p>Building upon the previous lesson we will now use sys_read to read the content of a newly created and opened file. We will store this string in a variable.</p>
+
+                        <p>sys_read expects 3 arguments - the number of bytes to read in EDX, the memory address of our variable in ECX and the <a href="https://en.wikipedia.org/wiki/File_descriptor" target="_blank">file descriptor</a> in EBX.  We will use the previous lessons sys_open code to obtain the file descriptor which we will then load into EBX. The sys_read opcode is then loaded into EAX and the kernel is called to read the file contents into our variable and is then printed to the screen.</p>
+
+                        <p>
+                            <span class="label label-info">Note:</span>
+                            We will reserve 255 bytes in the .bss section to store the contents of the file. <a href="#lesson9">See Lesson 9 for more information on the .bss section.</a>
+                        </p>
+
+                        <div class="snippet">
+                            <span class="filename">read.asm</span>
+                            <pre class="brush: asm;">
+                                ; Read
+                                ; Compile with: nasm -f elf read.asm
+                                ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 read.o -o read
+                                ; Run with: ./read
+
+                                %include    'functions.asm'
+
+                                SECTION .data
+                                filename db 'readme.txt', 0h    ; the filename to create
+                                contents db 'Hello world!', 0h  ; the contents to write
+
+                                SECTION .bss
+                                fileContents resb 255,          ; variable to store file contents
+
+                                SECTION .text
+                                global  _start
+
+                                _start:
+
+                                    mov     ecx, 0777           ; Create file from lesson 22
+                                    mov     ebx, filename
+                                    mov     eax, 8
+                                    int     80h
+
+                                    mov     edx, 12             ; Write contents to file from lesson 23
+                                    mov     ecx, contents
+                                    mov     ebx, eax
+                                    mov     eax, 4
+                                    int     80h
+
+                                    mov     ecx, 0              ; Open file from lesson 24
+                                    mov     ebx, filename
+                                    mov     eax, 5
+                                    int     80h
+
+                                    mov     edx, 12             ; number of bytes to read - one for each letter of the file contents
+                                    mov     ecx, fileContents   ; move the memory address of our file contents variable into ecx
+                                    mov     ebx, eax            ; move the opened file descriptor into EBX
+                                    mov     eax, 3              ; invoke SYS_READ (kernel opcode 3)
+                                    int     80h                 ; call the kernel
+
+                                    mov     eax, fileContents   ; move the memory address of our file contents variable into eax for printing
+                                    call    sprintLF            ; call our string printing function
+
+                                    call    quit                ; call our quit function
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf read.asm</span>
+                                    <span>~$ ld -m elf_i386 read.o -o read</span>
+                                    <span>~$ ./read</span>
+                                    <span>Hello world!</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </article>
+                </div>
+
+                <hr>
+
+                <div class="row-fluid" id="lesson26">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 26</h2>
+                            <h4>File Handling - Close</h4>
+                        </header>
+
+                        <p>Building upon the previous lesson we will now use sys_close to properly close an open file.</p>
+
+                        <p>sys_close expects 1 argument - the <a href="https://en.wikipedia.org/wiki/File_descriptor" target="_blank">file descriptor</a> in EBX.  We will use the previous lessons code to obtain the file descriptor which we will then load into EBX. The sys_close opcode is then loaded into EAX and the kernel is called to close the file and remove the active file descriptor.</p>
+
+                        <div class="snippet">
+                            <span class="filename">close.asm</span>
+                            <pre class="brush: asm;">
+                                ; Close
+                                ; Compile with: nasm -f elf close.asm
+                                ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 close.o -o close
+                                ; Run with: ./close
+
+                                %include    'functions.asm'
+
+                                SECTION .data
+                                filename db 'readme.txt', 0h    ; the filename to create
+                                contents db 'Hello world!', 0h  ; the contents to write
+
+                                SECTION .bss
+                                fileContents resb 255,          ; variable to store file contents
+
+                                SECTION .text
+                                global  _start
+
+                                _start:
+
+                                    mov     ecx, 0777           ; Create file from lesson 22
+                                    mov     ebx, filename
+                                    mov     eax, 8
+                                    int     80h
+
+                                    mov     edx, 12             ; Write contents to file from lesson 23
+                                    mov     ecx, contents
+                                    mov     ebx, eax
+                                    mov     eax, 4
+                                    int     80h
+
+                                    mov     ecx, 0              ; Open file from lesson 24
+                                    mov     ebx, filename
+                                    mov     eax, 5
+                                    int     80h
+
+                                    mov     edx, 12             ; Read file from lesson 25
+                                    mov     ecx, fileContents
+                                    mov     ebx, eax
+                                    mov     eax, 3
+                                    int     80h
+
+                                    mov     eax, fileContents
+                                    call    sprintLF
+
+                                    mov     ebx, ebx            ; not needed but used to demonstrate that SYS_CLOSE takes a file descriptor from EBX
+                                    mov     eax, 6              ; invoke SYS_CLOSE (kernel opcode 6)
+                                    int     80h                 ; call the kernel
+
+                                    call    quit                ; call our quit function
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf close.asm</span>
+                                    <span>~$ ld -m elf_i386 close.o -o close</span>
+                                    <span>~$ ./close</span>
+                                    <span>Hello world!</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p>
+                            <span class="label label-info">Note:</span>
+                            We have properly closed the file and removed the active file descriptor.
+                        </p>
+
+                    </article>
+                </div>
+
+                <hr>
+
+                <div class="row-fluid" id="lesson27">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 27</h2>
+                            <h4>File Handling - Seek</h4>
+                        </header>
+
+                        <p>In this lesson we will open a file and update the file contents at the end of the file using sys_lseek.</p>
+
+                        <p>Using sys_lseek you can move the cursor within the file by an offset in bytes.  The below example will move the cursor to the end of the file, then pass 0 bytes as the offset (so we append to the end of the file and not beyond) before writing a string in that position.  Try different values in ECX and EDX to write the content to different positions within the opened file.</p>
+
+                        <p>sys_lseek expects 3 arguments - the whence argument (table below) in EDX, the offset in bytes in ECX, and the <a href="https://en.wikipedia.org/wiki/File_descriptor" target="_blank">file descriptor</a> in EBX. The sys_lseek opcode is then loaded into EAX and we call the kernel to move the file pointer to the correct offset.  We then use sys_write to update the content at that position.</p>
+
+                        <div class="row-fluid">
+                            <div class="span6">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>Description</th>
+                                            <th>Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><b>SEEK_SET</b></td>
+                                            <td>beginning of the file</td>
+                                            <td>0</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>SEEK_CUR</b></td>
+                                            <td>current file offset</td>
+                                            <td>1</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>SEEK_END</b></td>
+                                            <td>end of the file</td>
+                                            <td>2</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <br>
+
+                        <p>
+                            <span class="label label-info">Note:</span>
+                            A file 'readme.txt' has been included in the code folder for this lesson. This file will be updated after running the program.
+                        </p>
+
+                        <div class="snippet">
+                            <span class="filename">seek.asm</span>
+                            <pre class="brush: asm;">
+                                ; Seek
+                                ; Compile with: nasm -f elf seek.asm
+                                ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 seek.o -o seek
+                                ; Run with: ./seek
+
+                                %include    'functions.asm'
+
+                                SECTION .data
+                                filename db 'readme.txt', 0h    ; the filename to create
+                                contents  db '-updated-', 0h     ; the contents to write at the start of the file
+
+                                SECTION .text
+                                global  _start
+
+                                _start:
+
+                                    mov     ecx, 1              ; flag for writeonly access mode (O_WRONLY)
+                                    mov     ebx, filename       ; filename of the file to open
+                                    mov     eax, 5              ; invoke SYS_OPEN (kernel opcode 5)
+                                    int     80h                 ; call the kernel
+
+                                    mov     edx, 2              ; whence argument (SEEK_END)
+                                    mov     ecx, 0              ; move the cursor 0 bytes
+                                    mov     ebx, eax            ; move the opened file descriptor into EBX
+                                    mov     eax, 19             ; invoke SYS_LSEEK (kernel opcode 19)
+                                    int     80h                 ; call the kernel
+
+                                    mov     edx, 9              ; number of bytes to write - one for each letter of our contents string
+                                    mov     ecx, contents       ; move the memory address of our contents string into ecx
+                                    mov     ebx, ebx            ; move the opened file descriptor into EBX (not required as EBX already has the FD)
+                                    mov     eax, 4              ; invoke SYS_WRITE (kernel opcode 4)
+                                    int     80h                 ; call the kernel
+
+                                    call    quit                ; call our quit function
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf seek.asm</span>
+                                    <span>~$ ld -m elf_i386 seek.o -o seek</span>
+                                    <span>~$ ./seek</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </article>
+                </div>
+
+                <div class="row-fluid" id="lesson28">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 28</h2>
+                            <h4>File Handling - Delete</h4>
+                        </header>
+
+                        <p>Deleting a file on linux is achieved by calling sys_unlink.</p>
+
+                        <p>sys_unlink expects 1 argument - the filename in EBX.  The sys_unlink opcode is then loaded into EAX and the kernel is called to delete the file.</p>
+
+                        <p>
+                            <span class="label label-info">Note:</span>
+                            A file 'readme.txt' has been included in the code folder for this lesson. This file will be deleted after running the program.
+                        </p>
+
+                        <div class="snippet">
+                            <span class="filename">unlink.asm</span>
+                            <pre class="brush: asm;">
+                                ; Unlink
+                                ; Compile with: nasm -f elf unlink.asm
+                                ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 unlink.o -o unlink
+                                ; Run with: ./unlink
+
+                                %include    'functions.asm'
+
+                                SECTION .data
+                                filename db 'readme.txt', 0h    ; the filename to delete
+
+                                SECTION .text
+                                global  _start
+
+                                _start:
+
+                                    mov     ebx, filename       ; filename we will delete
+                                    mov     eax, 10             ; invoke SYS_UNLINK (kernel opcode 10)
+                                    int     80h                 ; call the kernel
+
+                                    call    quit                ; call our quit function
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf unlink.asm</span>
+                                    <span>~$ ld -m elf_i386 unlink.o -o unlink</span>
+                                    <span>~$ ./unlink</span>
                                 </div>
                             </div>
                         </div>
