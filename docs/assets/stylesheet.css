@@ -36,6 +36,10 @@ div.snippet div.output .inner span { display: block; clear: both; line-height: 1
 .syntaxhighlighter table td.code .container:before,
 .syntaxhighlighter table td.code .container:after { display: none; }
 
+.btn-float,
+.btn-float:active { padding: 15px 17px; line-height: 2rem; font-size: 2rem; position: fixed; bottom: 40px; left: 40px; background-color: #006699; color: #fff; border-radius: 50%; text-align: center; box-shadow: 2px 2px 3px #999; }
+.btn-float:hover { color: #ddd; }
+
 /* Tablet
 ------------------------- */
 @media (max-width: 767px) {
