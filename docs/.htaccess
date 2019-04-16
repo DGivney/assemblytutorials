@@ -1,0 +1,51 @@
+# ----------------------------------------------------------------------
+# | Forcing `https://`                                                 |
+# ----------------------------------------------------------------------
+
+# Redirect from the `http://` to the `https://` version of the URL.
+#
+# https://wiki.apache.org/httpd/RewriteHTTPToHTTPS
+
+# (1) If you're using cPanel AutoSSL or the Let's Encrypt webroot
+#     method it will fail to validate the certificate if validation
+#     requests are redirected to HTTPS. Turn on the condition(s)
+#     you need.
+#
+#     https://www.iana.org/assignments/well-known-uris/well-known-uris.xhtml
+#     https://tools.ietf.org/html/draft-ietf-acme-acme-12
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTPS} !=on
+    RewriteCond %{HTTP_HOST} ^(asmtutor\.com) [NC]
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+</IfModule>
+
+# ----------------------------------------------------------------------
+# | Suppressing the `www.` at the beginning of URLs                    |
+# ----------------------------------------------------------------------
+
+# Rewrite www.example.com → example.com
+
+# The same content should never be available under two different
+# URLs, especially not with and without `www.` at the beginning.
+# This can cause SEO problems (duplicate content), and therefore,
+# you should choose one of the alternatives and redirect the other
+# one.
+#
+# (!) NEVER USE BOTH WWW-RELATED RULES AT THE SAME TIME!
+
+# (1) The rule assumes by default that both HTTP and HTTPS
+#     environments are available for redirection.
+#     If your SSL certificate could not handle one of the domains
+#     used during redirection, you should turn the condition on.
+#
+#     https://github.com/h5bp/server-configs-apache/issues/52
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # (1)
+    # RewriteCond %{HTTPS} !=on
+    RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+    RewriteRule ^ %{ENV:PROTO}://%1%{REQUEST_URI} [R=301,L]
+</IfModule>
