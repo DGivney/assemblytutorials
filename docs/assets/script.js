@@ -8,4 +8,16 @@ $(document).ready(function() {
         return v.replace(/\s(ADD|SUB|MOV|INT|RET|CMP|PUSH|POP|JMP|MUL|DIV)\s/gi, ' <span class="instruction-name">$1</span> ');
     });
 
+    $('.btn-float').hide();
+
+    $(document).scroll(function() {
+        var y = $(this).scrollTop();
+
+        if (y > 400) {
+            $('.btn-float').fadeIn();
+        } else {
+            $('.btn-float').fadeOut();
+        }
+    });
+
 });

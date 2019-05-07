@@ -74,6 +74,13 @@
                         <li><a href="#lesson26">Lesson 26 <span>File Handling - Close</span></a></li>
                         <li><a href="#lesson27">Lesson 27 <span>File Handling - Update</span></a></li>
                         <li><a href="#lesson28">Lesson 28 <span>File Handling - Delete</span></a></li>
+                        <li><a href="#lesson29">Lesson 29 <span>Sockets - Create</span></a></li>
+                        <li><a href="#lesson30">Lesson 30 <span>Sockets - Bind</span></a></li>
+                        <li><a href="#lesson31">Lesson 31 <span>Sockets - Listen</span></a></li>
+                        <li><a href="#lesson32">Lesson 32 <span>Sockets - Accept</span></a></li>
+                        <li><a href="#lesson33">Lesson 33 <span>Sockets - Read</span></a></li>
+                        <li><a href="#lesson34">Lesson 34 <span>Sockets - Write</span></a></li>
+                        <li><a href="#lesson35">Lesson 35 <span>Sockets - Close</span></a></li>
                     </ul>
                 </div>
             </div>
@@ -281,6 +288,54 @@
                         <h5>File Handling - Delete</h5>
                         <p>In this lesson we learn how to delete a file.</p>
                         <p><a class="btn" href="#lesson28">View lesson &raquo;</a></p>
+                    </div>
+                    <div class="span4">
+                        <h2>Lesson 29</h2>
+                        <h5>Sockets - Create</h5>
+                        <p>In this lesson we learn how to create a new socket in assembly and store it's file descriptor.</p>
+                        <p><a class="btn" href="#lesson29">View lesson &raquo;</a></p>
+                    </div>
+                    <div class="span4">
+                        <h2>Lesson 30</h2>
+                        <h5>Sockets - Bind</h5>
+                        <p>In this lesson we learn how to bind a socket to an IP Address &amp; Port Number.</p>
+                        <p><a class="btn" href="#lesson30">View lesson &raquo;</a></p>
+                    </div>
+                </div>
+
+                <div class="row-fluid hidden-phone">
+                    <div class="span4">
+                        <h2>Lesson 31</h2>
+                        <h5>Sockets - Listen</h5>
+                        <p>In this lesson we learn how to make a socket listen for incoming connections.</p>
+                        <p><a class="btn" href="#lesson31">View lesson &raquo;</a></p>
+                    </div>
+                    <div class="span4">
+                        <h2>Lesson 32</h2>
+                        <h5>Sockets - Accept</h5>
+                        <p>In this lesson we learn how to make a socket accept incoming connections.</p>
+                        <p><a class="btn" href="#lesson32">View lesson &raquo;</a></p>
+                    </div>
+                    <div class="span4">
+                        <h2>Lesson 33</h2>
+                        <h5>Sockets - Read</h5>
+                        <p>In this lesson we learn how to read incoming requests on a socket.</p>
+                        <p><a class="btn" href="#lesson33">View lesson &raquo;</a></p>
+                    </div>
+                </div>
+
+                <div class="row-fluid hidden-phone">
+                    <div class="span4">
+                        <h2>Lesson 34</h2>
+                        <h5>Sockets - Write</h5>
+                        <p>In this lesson we learn how to make a socket respond to incoming requests.</p>
+                        <p><a class="btn" href="#lesson34">View lesson &raquo;</a></p>
+                    </div>
+                    <div class="span4">
+                        <h2>Lesson 35</h2>
+                        <h5>Sockets - Close</h5>
+                        <p>In this lesson we learn how to shutdown and close an open socket connection.</p>
+                        <p><a class="btn" href="#lesson35">View lesson &raquo;</a></p>
                     </div>
                 </div>
 
@@ -2652,6 +2707,767 @@
                                 </div>
                             </div>
                         </div>
+
+                    </article>
+                </div>
+
+                <div class="row-fluid" id="lesson29">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 29</h2>
+                            <h4>Sockets - Create</h4>
+                        </header>
+
+                        <h5>Firstly, some background</h5>
+
+                        <p>Socket Programming in Linux is achieved through the use of the SYS_SOCKETCALL kernel function. The SYS_SOCKETCALL function is somewhat unique in that it encapsulates a number of different subroutines, all related to socket operations, within the one function. By passing different integer values in EBX we can change the behaviour of this function to create, listen, send, receive, close and more. <a href="https://gist.github.com/DGivney/7196bd7a9f21a12c9397bdcf9ae040d2" target="_blank">Click here</a> to view the full commented source code of the completed program.</p>
+
+                        <h5>Writing our program</h5>
+
+                        <p>We begin the tutorial by first initalizing some of our registers which we will use later to store important values.  We will then create a socket using SYS_SOCKETCALL's first subroutine which is called 'socket'.  We will then build upon our program in each of the following socket programming lessons, adding code as we go. Eventually we will have a full program that can create, bind, listen, accept, read, write and close sockets.</p>
+
+                        <p>SYS_SOCKETCALL's subroutine 'socket' expects 2 arguments - a pointer to an array of arguments in ECX and the integer value 1 in EBX.  The SYS_SOCKETCALL opcode is then loaded into EAX and the kernel is called to create the socket. Because everything in linux is a file, we recieve back the <a href="https://en.wikipedia.org/wiki/File_descriptor" target="_blank">file descriptor</a> of the created socket in EAX. This file descriptor can then be used for performing other socket programming functions.</p>
+
+                        <p>
+                            <span class="label label-info">Note:</span>
+                            XORing a register by itself is an efficent way of ensuring the register is initalised with the integer value zero and doesn't contain an unexpected value that could corrupt your program.
+                        </p>
+
+                        <div class="snippet">
+                            <span class="filename">socket.asm</span>
+                            <pre class="brush: asm;">
+                                ; Socket
+                                ; Compile with: nasm -f elf socket.asm
+                                ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 socket.o -o socket
+                                ; Run with: ./socket
+
+                                %include    'functions.asm'
+
+                                SECTION .text
+                                global  _start
+
+                                _start:
+
+                                    xor     eax, eax            ; init eax 0
+                                    xor     ebx, ebx            ; init ebx 0
+                                    xor     edi, edi            ; init edi 0
+                                    xor     esi, esi            ; init esi 0
+
+                                _socket:
+
+                                    push    byte 6              ; push 6 onto the stack (IPPROTO_TCP)
+                                    push    byte 1              ; push 1 onto the stack (SOCK_STREAM)
+                                    push    byte 2              ; push 2 onto the stack (PF_INET)
+                                    mov     ecx, esp            ; move address of arguments into ecx
+                                    mov     ebx, 1              ; invoke subroutine SOCKET (1)
+                                    mov     eax, 102            ; invoke SYS_SOCKETCALL (kernel opcode 102)
+                                    int     80h                 ; call the kernel
+
+                                    call    iprintLF            ; call our integer printing function (print the file descriptor in EAX or -1 on error)
+
+                                _exit:
+
+                                    call    quit                ; call our quit function
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf socket.asm</span>
+                                    <span>~$ ld -m elf_i386 socket.o -o socket</span>
+                                    <span>~$ ./socket</span>
+                                    <span>~$ 3</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </article>
+                </div>
+
+                <div class="row-fluid" id="lesson30">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 30</h2>
+                            <h4>Sockets - Bind</h4>
+                        </header>
+
+                        <p>Building on the previous lesson we will now associate the created socket with a local IP address and port which will allow us to connect to it.  We do this by calling the second subroutine of SYS_SOCKETCALL which is called 'bind'.</p>
+
+                        <p>We begin by storing the file descriptor we recieved in lesson 29 into EDI.  EDI was originally called the Destination Identifier and is traditionally used in copy routines to store the location of a target file.</p>
+
+                        <p>SYS_SOCKETCALL's subroutine 'bind' expects 2 arguments - a pointer to an array of arguments in ECX and the integer value 2 in EBX.  The SYS_SOCKETCALL opcode is then loaded into EAX and the kernel is called to bind the socket.</p>
+
+                        <div class="snippet">
+                            <span class="filename">socket.asm</span>
+                            <pre class="brush: asm;">
+                                ; Socket
+                                ; Compile with: nasm -f elf socket.asm
+                                ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 socket.o -o socket
+                                ; Run with: ./socket
+
+                                %include    'functions.asm'
+
+                                SECTION .text
+                                global  _start
+
+                                _start:
+
+                                    xor     eax, eax            ; initialize some registers
+                                    xor     ebx, ebx
+                                    xor     edi, edi
+                                    xor     esi, esi
+
+                                _socket:
+
+                                    push    byte 6              ; create socket from lesson 29
+                                    push    byte 1
+                                    push    byte 2
+                                    mov     ecx, esp
+                                    mov     ebx, 1
+                                    mov     eax, 102
+                                    int     80h
+
+                                _bind:
+
+                                    mov     edi, eax            ; move return value of SYS_SOCKETCALL into edi (file descriptor for new socket, or -1 on error)
+                                    push    dword 0x00000000    ; move 0 dec onto the stack IP ADDRESS
+                                    push    word 0x2923         ; move 9001 dec onto stack PORT
+                                    push    word 2              ; move 2 dec onto stack AF_INET
+                                    mov     ecx, esp            ; move address of stack pointer into ecx
+                                    push    byte 16             ; move 16 dec onto stack (arguments length)
+                                    push    ecx                 ; push the address of arguments onto stack
+                                    push    edi                 ; push the file descriptor onto stack
+                                    mov     ecx, esp            ; move address of arguments into ecx
+                                    mov     ebx, 2              ; invoke subroutine BIND (2)
+                                    mov     eax, 102            ; invoke SYS_SOCKETCALL (kernel opcode 102)
+                                    int     80h                 ; call the kernel
+
+                                _exit:
+
+                                    call    quit                ; call our quit function
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf socket.asm</span>
+                                    <span>~$ ld -m elf_i386 socket.o -o socket</span>
+                                    <span>~$ ./socket</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </article>
+                </div>
+
+                <div class="row-fluid" id="lesson31">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 31</h2>
+                            <h4>Sockets - Listen</h4>
+                        </header>
+
+                        <p>In the previous lessons we created a socket and used the 'bind' subroutine to associate it with a local IP address and port.  In this lesson we will use the 'listen' subroutine of SYS_SOCKETCALL to tell our socket to listen for incoming TCP requests. This will allow us to read and write to anyone who connects to our socket.</p>
+
+                        <p>SYS_SOCKETCALL's subroutine 'listen' expects 2 arguments - a pointer to an array of arguments in ECX and the integer value 4 in EBX.  The SYS_SOCKETCALL opcode is then loaded into EAX and the kernel is called. If succesful the socket will begin listening for incoming requests.</p>
+
+                        <div class="snippet">
+                            <span class="filename">socket.asm</span>
+                            <pre class="brush: asm;">
+                                ; Socket
+                                ; Compile with: nasm -f elf socket.asm
+                                ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 socket.o -o socket
+                                ; Run with: ./socket
+
+                                %include    'functions.asm'
+
+                                SECTION .text
+                                global  _start
+
+                                _start:
+
+                                    xor     eax, eax            ; initialize some registers
+                                    xor     ebx, ebx
+                                    xor     edi, edi
+                                    xor     esi, esi
+
+                                _socket:
+
+                                    push    byte 6              ; create socket from lesson 29
+                                    push    byte 1
+                                    push    byte 2
+                                    mov     ecx, esp
+                                    mov     ebx, 1
+                                    mov     eax, 102
+                                    int     80h
+
+                                _bind:
+
+                                    mov     edi, eax            ; bind socket from lesson 30
+                                    push    dword 0x00000000
+                                    push    word 0x2923
+                                    push    word 2
+                                    mov     ecx, esp
+                                    push    byte 16
+                                    push    ecx
+                                    push    edi
+                                    mov     ecx, esp
+                                    mov     ebx, 2
+                                    mov     eax, 102
+                                    int     80h
+
+                                _listen:
+
+                                    push    byte 1              ; move 1 onto stack (max queue length argument)
+                                    push    edi                 ; push the file descriptor onto stack
+                                    mov     ecx, esp            ; move address of arguments into ecx
+                                    mov     ebx, 4              ; invoke subroutine LISTEN (4)
+                                    mov     eax, 102            ; invoke SYS_SOCKETCALL (kernel opcode 102)
+                                    int     80h                 ; call the kernel
+
+                                _exit:
+
+                                    call    quit                ; call our quit function
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf socket.asm</span>
+                                    <span>~$ ld -m elf_i386 socket.o -o socket</span>
+                                    <span>~$ ./socket</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </article>
+                </div>
+
+                <div class="row-fluid" id="lesson32">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 32</h2>
+                            <h4>Sockets - Accept</h4>
+                        </header>
+
+                        <p>In the previous lessons we created a socket and used the 'bind' subroutine to associate it with a local IP address and port.  We then used the 'listen' subroutine of SYS_SOCKETCALL to tell our socket to listen for incoming TCP requests. Now we will use the 'accept' subroutine of SYS_SOCKETCALL to tell our socket to accept those incoming requests. Our socket will then be ready to read and write to remote connections.</p>
+
+                        <p>SYS_SOCKETCALL's subroutine 'accept' expects 2 arguments - a pointer to an array of arguments in ECX and the integer value 4 in EBX.  The SYS_SOCKETCALL opcode is then loaded into EAX and the kernel is called. The 'accept' subroutine will create another file descriptor, this time identifying the incoming socket connection. We will use this file descriptor to read and write to the incoming connection in later lessons.</p>
+
+                        <p>
+                            <span class="label label-info">Note:</span>
+                            Run the program and use the command <kbd>sudo netstat -plnt</kbd> in another terminal to view the socket listening on port 9001.
+                        </p>
+
+                        <div class="snippet">
+                            <span class="filename">socket.asm</span>
+                            <pre class="brush: asm;">
+                                ; Socket
+                                ; Compile with: nasm -f elf socket.asm
+                                ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 socket.o -o socket
+                                ; Run with: ./socket
+
+                                %include    'functions.asm'
+
+                                SECTION .text
+                                global  _start
+
+                                _start:
+
+                                    xor     eax, eax            ; initialize some registers
+                                    xor     ebx, ebx
+                                    xor     edi, edi
+                                    xor     esi, esi
+
+                                _socket:
+
+                                    push    byte 6              ; create socket from lesson 29
+                                    push    byte 1
+                                    push    byte 2
+                                    mov     ecx, esp
+                                    mov     ebx, 1
+                                    mov     eax, 102
+                                    int     80h
+
+                                _bind:
+
+                                    mov     edi, eax            ; bind socket from lesson 30
+                                    push    dword 0x00000000
+                                    push    word 0x2923
+                                    push    word 2
+                                    mov     ecx, esp
+                                    push    byte 16
+                                    push    ecx
+                                    push    edi
+                                    mov     ecx, esp
+                                    mov     ebx, 2
+                                    mov     eax, 102
+                                    int     80h
+
+                                _listen:
+
+                                    push    byte 1              ; listen socket from lesson 31
+                                    push    edi
+                                    mov     ecx, esp
+                                    mov     ebx, 4
+                                    mov     eax, 102
+                                    int     80h
+
+                                _accept:
+
+                                    push    byte 0              ; push 0 dec onto stack (address length argument)
+                                    push    byte 0              ; push 0 dec onto stack (address argument)
+                                    push    edi                 ; push the file descriptor onto stack
+                                    mov     ecx, esp            ; move address of arguments into ecx
+                                    mov     ebx, 5              ; invoke subroutine ACCEPT (5)
+                                    mov     eax, 102            ; invoke SYS_SOCKETCALL (kernel opcode 102)
+                                    int     80h                 ; call the kernel
+
+                                _exit:
+
+                                    call    quit                ; call our quit function
+
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf socket.asm</span>
+                                    <span>~$ ld -m elf_i386 socket.o -o socket</span>
+                                    <span>~$ ./socket</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </article>
+                </div>
+
+                <div class="row-fluid" id="lesson33">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 33</h2>
+                            <h4>Sockets - Read</h4>
+                        </header>
+
+                        <p>When an incoming connection is accepted by our socket, a new file descriptor identifying the incoming socket connection is returned in EAX.  In this lesson we will use this file descriptor to read the incoming request headers from the connection.</p>
+
+                        <p>We will use the kernel function sys_read to read from the incoming socket connection.  As we have done in previous lessons, we will create a variable to store the contents being read from the file descriptor. Our socket will be using the HTTP protocol to communicate.  Parsing HTTP request headers to determine the length of the incoming message and accepted response formats is beyond the scope of this tutorial.  We will instead just read up to the first 255 bytes and print that to standardout.</p>
+
+                        <p>Once the incoming connection has been accepted, it is very common for webservers to spawn a child process to manage the read/write communication. The parent process is then free to return to the listening/accept state and accept any new incoming requests in parallel. We will implement this design pattern below using SYS_FORK and the JMP instruction prior to reading the request headers in the child process.</p>
+
+                        <p>To generate valid request headers we will use the commandline tool <kbd>curl</kbd> to connect to our listening socket. But you can also use a standard web browser to connect in the same way.</p>
+
+                        <p>sys_read expects 3 arguments - the number of bytes to read in EDX, the memory address of our variable in ECX and the <a href="https://en.wikipedia.org/wiki/File_descriptor" target="_blank">file descriptor</a> in EBX. The sys_read opcode is then loaded into EAX and the kernel is called to read the contents into our variable which is then printed to the screen.</p>
+
+                        <p>
+                            <span class="label label-info">Note:</span>
+                            We will reserve 255 bytes in the .bss section to store the contents being read from the file descriptor. <a href="#lesson9">See Lesson 9 for more information on the .bss section.</a>
+                        </p>
+
+                        <p>
+                            <span class="label label-info">Note:</span>
+                            Run the program and use the command <kbd>curl http://localhost:9001</kbd> in another terminal to view the request headers being read by our program.
+                        </p>
+
+                        <div class="snippet">
+                            <span class="filename">socket.asm</span>
+                            <pre class="brush: asm;">
+                                ; Socket
+                                ; Compile with: nasm -f elf socket.asm
+                                ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 socket.o -o socket
+                                ; Run with: ./socket
+
+                                %include    'functions.asm'
+
+                                SECTION .bss
+                                buffer resb 255,                ; variable to store request headers
+
+                                SECTION .text
+                                global  _start
+
+                                _start:
+
+                                    xor     eax, eax            ; initialize some registers
+                                    xor     ebx, ebx
+                                    xor     edi, edi
+                                    xor     esi, esi
+
+                                _socket:
+
+                                    push    byte 6              ; create socket from lesson 29
+                                    push    byte 1
+                                    push    byte 2
+                                    mov     ecx, esp
+                                    mov     ebx, 1
+                                    mov     eax, 102
+                                    int     80h
+
+                                _bind:
+
+                                    mov     edi, eax            ; bind socket from lesson 30
+                                    push    dword 0x00000000
+                                    push    word 0x2923
+                                    push    word 2
+                                    mov     ecx, esp
+                                    push    byte 16
+                                    push    ecx
+                                    push    edi
+                                    mov     ecx, esp
+                                    mov     ebx, 2
+                                    mov     eax, 102
+                                    int     80h
+
+                                _listen:
+
+                                    push    byte 1              ; listen socket from lesson 31
+                                    push    edi
+                                    mov     ecx, esp
+                                    mov     ebx, 4
+                                    mov     eax, 102
+                                    int     80h
+
+                                _accept:
+
+                                    push    byte 0              ; accept socket from lesson 32
+                                    push    byte 0
+                                    push    edi
+                                    mov     ecx, esp
+                                    mov     ebx, 5
+                                    mov     eax, 102
+                                    int     80h
+
+                                _fork:
+
+                                    mov     esi, eax            ; move return value of SYS_SOCKETCALL into esi (file descriptor for accepted socket, or -1 on error)
+                                    mov     eax, 2              ; invoke SYS_FORK (kernel opcode 2)
+                                    int     80h                 ; call the kernel
+
+                                    cmp     eax, 0              ; if return value of SYS_FORK in eax is zero we are in the child process
+                                    jz      _read               ; jmp in child process to _read
+
+                                    jmp     _accept             ; jmp in parent process to _accept
+
+                                _read:
+
+                                    mov     edx, 255            ; number of bytes to read (we will only read the first 255 bytes for simplicity)
+                                    mov     ecx, buffer         ; move the memory address of our buffer variable into ecx
+                                    mov     ebx, esi            ; move esi into ebx (accepted socket file descriptor)
+                                    mov     eax, 3              ; invoke SYS_READ (kernel opcode 3)
+                                    int     80h                 ; call the kernel
+
+                                    mov     eax, buffer         ; move the memory address of our buffer variable into eax for printing
+                                    call    sprintLF            ; call our string printing function
+
+                                _exit:
+
+                                    call    quit                ; call our quit function
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf socket.asm</span>
+                                    <span>~$ ld -m elf_i386 socket.o -o socket</span>
+                                    <span>~$ ./socket</span>
+                                    <span>~$ GET / HTTP/1.1</span>
+                                    <span>~$ Host: localhost:9001</span>
+                                    <span>~$ User-Agent: curl/x.xx.x</span>
+                                    <span>~$ Accept: */*</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </article>
+                </div>
+                <div class="row-fluid" id="lesson34">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 34</h2>
+                            <h4>Sockets - Write</h4>
+                        </header>
+
+                        <p>When an incoming connection is accepted by our socket, a new file descriptor identifying the incoming socket connection is returned in EAX.  In this lesson we will use this file descriptor to send our response to the connection.</p>
+
+                        <p>We will use the kernel function sys_write to write to the incoming socket connection.</p>
+
+                        <p>sys_write expects 3 arguments - the number of bytes to write in EDX, the response string to write in ECX and the <a href="https://en.wikipedia.org/wiki/File_descriptor" target="_blank">file descriptor</a> in EBX.  The sys_write opcode is then loaded into EAX and the kernel is called to send our response back through our socket to the incoming connection.</p>
+
+                        <p>
+                            <span class="label label-info">Note:</span>
+                            We will create a variable in the .data section to store the response we will write to the file descriptor. <a href="#lesson1">See Lesson 1 for more information on the .data section.</a>
+                        </p>
+
+                        <p>
+                            <span class="label label-info">Note:</span>
+                            Run the program and use the command <kbd>curl http://localhost:9001</kbd> in another terminal to view the response sent via our socket. Or connect to the same address using any standard web browser.
+                        </p>
+
+                        <div class="snippet">
+                            <span class="filename">socket.asm</span>
+                            <pre class="brush: asm;">
+                                ; Socket
+                                ; Compile with: nasm -f elf socket.asm
+                                ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 socket.o -o socket
+                                ; Run with: ./socket
+
+                                %include    'functions.asm'
+
+                                SECTION .data
+                                ; our response string
+                                response db 'HTTP/1.1 200 OK', 0Dh, 0Ah, 'Content-Type: text/html', 0Dh, 0Ah, 'Content-Length: 14', 0Dh, 0Ah, 0Dh, 0Ah, 'Hello World!', 0Dh, 0Ah, 0h
+
+                                SECTION .bss
+                                buffer resb 255,                ; variable to store request headers
+
+                                SECTION .text
+                                global  _start
+
+                                _start:
+
+                                    xor     eax, eax            ; initialize some registers
+                                    xor     ebx, ebx
+                                    xor     edi, edi
+                                    xor     esi, esi
+
+                                _socket:
+
+                                    push    byte 6              ; create socket from lesson 29
+                                    push    byte 1
+                                    push    byte 2
+                                    mov     ecx, esp
+                                    mov     ebx, 1
+                                    mov     eax, 102
+                                    int     80h
+
+                                _bind:
+
+                                    mov     edi, eax            ; bind socket from lesson 30
+                                    push    dword 0x00000000
+                                    push    word 0x2923
+                                    push    word 2
+                                    mov     ecx, esp
+                                    push    byte 16
+                                    push    ecx
+                                    push    edi
+                                    mov     ecx, esp
+                                    mov     ebx, 2
+                                    mov     eax, 102
+                                    int     80h
+
+                                _listen:
+
+                                    push    byte 1              ; listen socket from lesson 31
+                                    push    edi
+                                    mov     ecx, esp
+                                    mov     ebx, 4
+                                    mov     eax, 102
+                                    int     80h
+
+                                _accept:
+
+                                    push    byte 0              ; accept socket from lesson 32
+                                    push    byte 0
+                                    push    edi
+                                    mov     ecx, esp
+                                    mov     ebx, 5
+                                    mov     eax, 102
+                                    int     80h
+
+                                _fork:
+
+                                    mov     esi, eax            ; fork socket from lesson 33
+                                    mov     eax, 2
+                                    int     80h
+
+                                    cmp     eax, 0
+                                    jz      _read
+
+                                    jmp     _accept
+
+                                _read:
+
+                                    mov     edx, 255            ; read socket from lesson 33
+                                    mov     ecx, buffer
+                                    mov     ebx, esi
+                                    mov     eax, 3
+                                    int     80h
+
+                                    mov     eax, buffer
+                                    call    sprintLF
+
+                                _write:
+
+                                    mov     edx, 78             ; move 78 dec into edx (length in bytes to write)
+                                    mov     ecx, response       ; move address of our response variable into ecx
+                                    mov     ebx, esi            ; move file descriptor into ebx (accepted socket id)
+                                    mov     eax, 4              ; invoke SYS_WRITE (kernel opcode 4)
+                                    int     80h                 ; call the kernel
+
+                                _exit:
+
+                                    call    quit                ; call our quit function
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf socket.asm</span>
+                                    <span>~$ ld -m elf_i386 socket.o -o socket</span>
+                                    <span>~$ ./socket</span>
+                                </div>
+                            </div>
+
+                            <br>
+
+                            <span class="filename">New terminal window</span>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ curl http://localhost:9001</span>
+                                    <span>~$ Hello World!</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </article>
+                </div>
+                <div class="row-fluid" id="lesson35">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 35</h2>
+                            <h4>Sockets - Close</h4>
+                        </header>
+
+                        <p>In this lesson we will use sys_close to properly close the active socket connection in the child process after our response has been sent. This will free up some resources that can be used to accept new incoming connections.</p>
+
+                        <p>sys_close expects 1 argument - the <a href="https://en.wikipedia.org/wiki/File_descriptor" target="_blank">file descriptor</a> in EBX. The sys_close opcode is then loaded into EAX and the kernel is called to close the socket and remove the active file descriptor.</p>
+
+                        <p>
+                            <span class="label label-info">Note:</span>
+                            Run the program and use the command <kbd>curl http://localhost:9001</kbd> in another terminal or connect to the same address using any standard web browser.
+                        </p>
+
+                        <div class="snippet">
+                            <span class="filename">socket.asm</span>
+                            <pre class="brush: asm;">
+                                ; Socket
+                                ; Compile with: nasm -f elf socket.asm
+                                ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 socket.o -o socket
+                                ; Run with: ./socket
+
+                                %include    'functions.asm'
+
+                                SECTION .data
+                                ; our response string
+                                response db 'HTTP/1.1 200 OK', 0Dh, 0Ah, 'Content-Type: text/html', 0Dh, 0Ah, 'Content-Length: 14', 0Dh, 0Ah, 0Dh, 0Ah, 'Hello World!', 0Dh, 0Ah, 0h
+
+                                SECTION .bss
+                                buffer resb 255,                ; variable to store request headers
+
+                                SECTION .text
+                                global  _start
+
+                                _start:
+
+                                    xor     eax, eax            ; initialize some registers
+                                    xor     ebx, ebx
+                                    xor     edi, edi
+                                    xor     esi, esi
+
+                                _socket:
+
+                                    push    byte 6              ; create socket from lesson 29
+                                    push    byte 1
+                                    push    byte 2
+                                    mov     ecx, esp
+                                    mov     ebx, 1
+                                    mov     eax, 102
+                                    int     80h
+
+                                _bind:
+
+                                    mov     edi, eax            ; bind socket from lesson 30
+                                    push    dword 0x00000000
+                                    push    word 0x2923
+                                    push    word 2
+                                    mov     ecx, esp
+                                    push    byte 16
+                                    push    ecx
+                                    push    edi
+                                    mov     ecx, esp
+                                    mov     ebx, 2
+                                    mov     eax, 102
+                                    int     80h
+
+                                _listen:
+
+                                    push    byte 1              ; listen socket from lesson 31
+                                    push    edi
+                                    mov     ecx, esp
+                                    mov     ebx, 4
+                                    mov     eax, 102
+                                    int     80h
+
+                                _accept:
+
+                                    push    byte 0              ; accept socket from lesson 32
+                                    push    byte 0
+                                    push    edi
+                                    mov     ecx, esp
+                                    mov     ebx, 5
+                                    mov     eax, 102
+                                    int     80h
+
+                                _fork:
+
+                                    mov     esi, eax            ; fork socket from lesson 33
+                                    mov     eax, 2
+                                    int     80h
+
+                                    cmp     eax, 0
+                                    jz      _read
+
+                                    jmp     _accept
+
+                                _read:
+
+                                    mov     edx, 255            ; read socket from lesson 33
+                                    mov     ecx, buffer
+                                    mov     ebx, esi
+                                    mov     eax, 3
+                                    int     80h
+
+                                    mov     eax, buffer
+                                    call    sprintLF
+
+                                _write:
+
+                                    mov     edx, 78             ; write socket from lesson 34
+                                    mov     ecx, response
+                                    mov     ebx, esi
+                                    mov     eax, 4
+                                    int     80h
+
+                                _close:
+
+                                    mov     ebx, esi            ; move esi into ebx (accepted socket file descriptor)
+                                    mov     eax, 6              ; invoke SYS_CLOSE (kernel opcode 6)
+                                    int     80h                 ; call the kernel
+
+                                _exit:
+
+                                    call    quit                ; call our quit function
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf socket.asm</span>
+                                    <span>~$ ld -m elf_i386 socket.o -o socket</span>
+                                    <span>~$ ./socket</span>
+                                </div>
+                            </div>
+
+                            <br>
+
+                            <span class="filename">New terminal window</span>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ curl http://localhost:9001</span>
+                                    <span>~$ Hello World!</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p>
+                            <span class="label label-info">Note:</span>
+                            We have properly closed the socket connections and removed their active file descriptors.
+                        </p>
 
                     </article>
                 </div>
