@@ -2774,7 +2774,7 @@
                                     <span>~$ nasm -f elf socket.asm</span>
                                     <span>~$ ld -m elf_i386 socket.o -o socket</span>
                                     <span>~$ ./socket</span>
-                                    <span>~$ 3</span>
+                                    <span>3</span>
                                 </div>
                             </div>
                         </div>
@@ -2791,7 +2791,7 @@
 
                         <p>Building on the previous lesson we will now associate the created socket with a local IP address and port which will allow us to connect to it.  We do this by calling the second subroutine of SYS_SOCKETCALL which is called 'bind'.</p>
 
-                        <p>We begin by storing the file descriptor we recieved in lesson 29 into EDI.  EDI was originally called the Destination Identifier and is traditionally used in copy routines to store the location of a target file.</p>
+                        <p>We begin by storing the file descriptor we recieved in lesson 29 into EDI.  EDI was originally called the Destination Index and is traditionally used in copy routines to store the location of a target file.</p>
 
                         <p>SYS_SOCKETCALL's subroutine 'bind' expects 2 arguments - a pointer to an array of arguments in ECX and the integer value 2 in EBX.  The SYS_SOCKETCALL opcode is then loaded into EAX and the kernel is called to bind the socket.</p>
 
@@ -3043,6 +3043,8 @@
 
                         <p>When an incoming connection is accepted by our socket, a new file descriptor identifying the incoming socket connection is returned in EAX.  In this lesson we will use this file descriptor to read the incoming request headers from the connection.</p>
 
+                        <p>We begin by storing the file descriptor we recieved in lesson 32 into ESI.  ESI was originally called the Source Index and is traditionally used in copy routines to store the location of a target file.</p>
+
                         <p>We will use the kernel function sys_read to read from the incoming socket connection.  As we have done in previous lessons, we will create a variable to store the contents being read from the file descriptor. Our socket will be using the HTTP protocol to communicate.  Parsing HTTP request headers to determine the length of the incoming message and accepted response formats is beyond the scope of this tutorial.  We will instead just read up to the first 255 bytes and print that to standardout.</p>
 
                         <p>Once the incoming connection has been accepted, it is very common for webservers to spawn a child process to manage the read/write communication. The parent process is then free to return to the listening/accept state and accept any new incoming requests in parallel. We will implement this design pattern below using SYS_FORK and the JMP instruction prior to reading the request headers in the child process.</p>
@@ -3159,16 +3161,17 @@
                                     <span>~$ nasm -f elf socket.asm</span>
                                     <span>~$ ld -m elf_i386 socket.o -o socket</span>
                                     <span>~$ ./socket</span>
-                                    <span>~$ GET / HTTP/1.1</span>
-                                    <span>~$ Host: localhost:9001</span>
-                                    <span>~$ User-Agent: curl/x.xx.x</span>
-                                    <span>~$ Accept: */*</span>
+                                    <span>GET / HTTP/1.1</span>
+                                    <span>Host: localhost:9001</span>
+                                    <span>User-Agent: curl/x.xx.x</span>
+                                    <span>Accept: */*</span>
                                 </div>
                             </div>
                         </div>
 
                     </article>
                 </div>
+
                 <div class="row-fluid" id="lesson34">
                     <article class="span12">
                         <header>
@@ -3311,13 +3314,14 @@
                             <div class="output">
                                 <div class="inner">
                                     <span>~$ curl http://localhost:9001</span>
-                                    <span>~$ Hello World!</span>
+                                    <span>Hello World!</span>
                                 </div>
                             </div>
                         </div>
 
                     </article>
                 </div>
+
                 <div class="row-fluid" id="lesson35">
                     <article class="span12">
                         <header>
@@ -3459,7 +3463,7 @@
                             <div class="output">
                                 <div class="inner">
                                     <span>~$ curl http://localhost:9001</span>
-                                    <span>~$ Hello World!</span>
+                                    <span>Hello World!</span>
                                 </div>
                             </div>
                         </div>
