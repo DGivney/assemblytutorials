@@ -1647,9 +1647,9 @@
 
                         <h5>How does the atoi function work</h5>
 
-                        <p>Converting an ascii string into an integer value is not a trivial task.  We know how to convert an integer to an ascii string so the process should essentially work in reverse.  Firstly we take the address of the string and move it into ESI (originally known as the source register). We will then move along the string byte by byte (think of each byte as being a single digit or decimal placeholder).  For each digit we will check if it's value is between 48-57 (ascii values for the digits 0-9). We will also check if the value is a linefeed or null terminating byte meaning we have reached the end of the string.</p>
+                        <p>Converting an ascii string into an integer value is not a trivial task.  We know how to convert an integer to an ascii string so the process should essentially work in reverse.  Firstly we take the address of the string and move it into ESI (originally known as the source register). We will then move along the string byte by byte (think of each byte as being a single digit or decimal placeholder).  For each digit we will check if it's value is between 48-57 (ascii values for the digits 0-9).</p>
 
-                        <p>Once we have performed all these checks and determined that the byte can be converted to an integer will perform the following logic.  We will subtract 48 from the value – converting the ascii value to it's decimal equivalent. We will then add this value to EAX (the general purpose register that will store our result). We will then multiple EAX by 10 as each byte represents a decimal placeholder and continue the loop.</p>
+                        <p>Once we have performed this check and determined that the byte can be converted to an integer we will perform the following logic.  We will subtract 48 from the value – converting the ascii value to it's decimal equivalent. We will then add this value to EAX (the general purpose register that will store our result). We will then multiple EAX by 10 as each byte represents a decimal placeholder and continue the loop.</p>
 
                         <p>When all bytes have been converted we need to do one last thing before we return the result.  The last digit of any number represents a single unit (not a multiple of 10) so we have multiplied our result one too many times.  We simple divide it by 10 once to correct this and then return.</p>
 
@@ -1688,10 +1688,6 @@
                                 jl      .finished       ; jump if less than to label finished
                                 cmp     bl, 57          ; compare ebx register's lower half value against ascii value 57 (char value 9)
                                 jg      .finished       ; jump if greater than to label finished
-                                cmp     bl, 10          ; compare ebx register's lower half value against ascii value 10 (linefeed character)
-                                je      .finished       ; jump if equal to label finished
-                                cmp     bl, 0           ; compare ebx register's lower half value against decimal value 0 (end of string)
-                                jz      .finished       ; jump if zero to label finished
 
                                 sub     bl, 48          ; convert ebx register's lower half to decimal representation of ascii value
                                 add     eax, ebx        ; add ebx to our interger value in eax
