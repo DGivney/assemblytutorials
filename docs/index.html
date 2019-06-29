@@ -1643,7 +1643,7 @@
 
                         <h5>Writing our program</h5>
 
-                        <p>Our program begins by using the POP instruction to get the number of passed arguments off the stack.  This value is stored in ECX (originally known as the counter register).  It will then loop through these arguments popping each one off the stack and performing our addition logic. As we know, arguments passed via the command line are received by our program as strings.  Before we can add the arguments together we will need to convert them to integers otherwise our result will not be correct. We do this by calling our Ascii to Integer function (atoi).  This function will convert the ascii value into an integer and place the result in EAX.  We can then add this value to EDX (originally known as the data register) where we will store the result of our additions. If the value passed to atoi is not an ascii representation of an integer our function will return zero instead. When all arguments have been converted and added together we will print out the result and call our quit function.</p>
+                        <p>Our program begins by using the POP instruction to get the number of passed arguments off the stack.  This value is stored in ECX (originally known as the counter register).  It will then POP the next value off the stack containing the program name and remove it from the number of arguments stored in ECX.  It will then loop through the rest of the arguments popping each one off the stack and performing our addition logic. As we know, arguments passed via the command line are received by our program as strings.  Before we can add the arguments together we will need to convert them to integers otherwise our result will not be correct. We do this by calling our Ascii to Integer function (atoi).  This function will convert the ascii value into an integer and place the result in EAX.  We can then add this value to EDX (originally known as the data register) where we will store the result of our additions. If the value passed to atoi is not an ascii representation of an integer our function will return zero instead. When all arguments have been converted and added together we will print out the result and call our quit function.</p>
 
                         <h5>How does the atoi function work</h5>
 
@@ -1723,6 +1723,8 @@
                             _start:
 
                                 pop     ecx             ; first value on the stack is the number of arguments
+                                pop     edx             ; second value on the stack is the program name (discarded when we initialise edx)
+                                sub     ecx, 1          ; decrease ecx by 1 (number of arguments without program name)
                                 mov     edx, 0          ; initialise our data register to store additions
 
                             nextArg:

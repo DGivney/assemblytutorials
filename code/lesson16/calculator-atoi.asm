@@ -11,6 +11,8 @@ global  _start
 _start:
 
     pop     ecx             ; first value on the stack is the number of arguments
+    pop     edx             ; second value on the stack is the program name (discarded when we initialise edx)
+    sub     ecx, 1          ; decrease ecx by 1 (number of arguments without program name)
     mov     edx, 0          ; initialise our data register to store additions
 
 nextArg:
