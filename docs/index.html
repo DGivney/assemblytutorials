@@ -81,6 +81,7 @@
                         <li><a href="#lesson33">Lesson 33 <span>Sockets - Read</span></a></li>
                         <li><a href="#lesson34">Lesson 34 <span>Sockets - Write</span></a></li>
                         <li><a href="#lesson35">Lesson 35 <span>Sockets - Close</span></a></li>
+                        <li><a href="#lesson36">Lesson 36 <span>Download a Webpage</span></a></li>
                     </ul>
                 </div>
             </div>
@@ -89,7 +90,7 @@
 
                 <div class="hero-unit">
                     <h2>Learn Assembly Language</h2>
-                    <p>This project was put together to teach myself NASM 64bit assembly language on linux.</p>
+                    <p>This project was put together to teach myself NASM x86 assembly language on linux.</p>
                     <p><a href="https://github.com/DGivney/assemblytutorials" class="btn btn-primary btn" target="_blank">Github Project &raquo;</a></p>
                 </div>
 
@@ -336,6 +337,12 @@
                         <h5>Sockets - Close</h5>
                         <p>In this lesson we learn how to shutdown and close an open socket connection.</p>
                         <p><a class="btn" href="#lesson35">View lesson &raquo;</a></p>
+                    </div>
+                    <div class="span4">
+                        <h2>Lesson 36</h2>
+                        <h5>Download a Webpage</h5>
+                        <p>In this lesson we're going to connect to a webserver and send a HTTP request for a webpage. We'll then print the server's response to our terminal.</p>
+                        <p><a class="btn" href="#lesson36">View lesson &raquo;</a></p>
                     </div>
                 </div>
 
@@ -3473,6 +3480,160 @@
                             We have properly closed the socket connections and removed their active file descriptors.
                         </p>
 
+                    </article>
+                </div>
+
+                <div class="row-fluid" id="lesson36">
+                    <article class="span12">
+                        <header>
+                            <h2>Lesson 36</h2>
+                            <h4>Download a Webpage</h4>
+                        </header>
+
+                        <p>In the previous lessons we have been learning how to use the many subroutines of the SYS_SOCKETCALL kernel function to create, manage and transfer data through Linux sockets. We will continue that theme in this lesson by using the 'connect' subroutine of SYS_SOCKETCALL to connect to a remote webserver and download a webpage.</p>
+
+                        <p>These are the steps we need to follow to connect a socket to a remote server:
+                            <ul>
+                                <li> Call SYS_SOCKETCALL's subroutine 'socket' to create an active socket that we will use to send outbound requests.</li>
+                                <li> Call SYS_SOCKETCALL's subroutine 'connect' to connect our socket with a socket on the remote webserver.</li>
+                                <li> Use SYS_WRITE to send a HTTP formatted request through our socket to the remote webserver.</li>
+                                <li> Use SYS_READ to recieve the HTTP formatted response from the webserver.</li>
+                            </ul>
+                            We will then use our string printing function to print the response to our terminal.
+                        </p>
+
+                        <h5>What is a HTTP Request</h5>
+
+                        <p>The HTTP specification has evolved through a number of standard versions including <a href="https://tools.ietf.org/html/rfc1945" target="_blank">1.0 in RFC1945</a>, <a href="https://tools.ietf.org/html/rfc2068" target="_blank">1.1 in RFC2068</a> and <a href="https://tools.ietf.org/html/rfc7540" target="_blank">2.0 in RFC7540</a>.  Version 1.1 is still the most common today.</p>
+
+                        <p>A HTTP/1.1 request is comprised of 3 sections:
+                            <ol>
+                                <li> A line containing the <i>request method</i>, <i>request url</i>, and <i>http version</i></li>
+                                <li> An optional section of <i><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers">request headers</a></i></li>
+                                <li> An <i>empty line</i> that tells the remote server you have finished sending the request and you will begin waiting for the response.</li>
+                            </ol>
+                        </p>
+
+                        <p>A typical HTTP request for the root document on this server would look like this:</p>
+
+                        <div class="snippet">
+                            <pre class="brush: asm;">
+                                GET / HTTP/1.1                  ; A line containing the request method, url and version
+                                Host: asmtutor.com              ; A section of request headers
+                                                                ; A required empty line
+                            </pre>
+                        </div>
+
+                        <h5>Writing our program</h5>
+
+                        <p>This tutorial starts out like the previous ones by calling SYS_SOCKETCALL's subroutine 'socket' to initially create our socket.  However, instead of calling 'bind' on this socket we will call 'connect' with an IP Address and Port Number to connect our socket to a remote webserver. We will then use the SYS_WRITE and SYS_READ kernel methods to transfer data between the two sockets by sending a HTTP request and reading the HTTP response.</p>
+
+                        <p>SYS_SOCKETCALL's subroutine 'connect' expects 2 arguments - a pointer to an array of arguments in ECX and the integer value 3 in EBX.  The SYS_SOCKETCALL opcode is then loaded into EAX and the kernel is called to connect to the socket.</p>
+
+                        <p>
+                            <span class="label label-info">Note:</span>
+                            In Linux we can use the following command <kbd>./crawler > index.html</kbd> to save the output of our program to a file instead.
+                        </p>
+
+                        <div class="snippet">
+                            <span class="filename">crawler.asm</span>
+                            <pre class="brush: asm;">
+                                ; Crawler
+                                ; Compile with: nasm -f elf crawler.asm
+                                ; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 crawler.o -o crawler
+                                ; Run with: ./crawler
+
+                                %include    'functions.asm'
+
+                                SECTION .data
+                                ; our request string
+                                request db 'GET / HTTP/1.1', 0Dh, 0Ah, 'Host: 139.162.39.66:80', 0Dh, 0Ah, 0Dh, 0Ah, 0h
+
+                                SECTION .bss
+                                buffer resb 1,                  ; variable to store response
+
+                                SECTION .text
+                                global  _start
+
+                                _start:
+
+                                    xor     eax, eax            ; init eax 0
+                                    xor     ebx, ebx            ; init ebx 0
+                                    xor     edi, edi            ; init edi 0
+
+                                _socket:
+
+                                    push    byte 6              ; push 6 onto the stack (IPPROTO_TCP)
+                                    push    byte 1              ; push 1 onto the stack (SOCK_STREAM)
+                                    push    byte 2              ; push 2 onto the stack (PF_INET)
+                                    mov     ecx, esp            ; move address of arguments into ecx
+                                    mov     ebx, 1              ; invoke subroutine SOCKET (1)
+                                    mov     eax, 102            ; invoke SYS_SOCKETCALL (kernel opcode 102)
+                                    int     80h                 ; call the kernel
+
+                                _connect:
+
+                                    mov     edi, eax            ; move return value of SYS_SOCKETCALL into edi (file descriptor for new socket, or -1 on error)
+                                    push    dword 0x4227a28b    ; push 139.162.39.66 onto the stack IP ADDRESS (reverse byte order)
+                                    push    word 0x5000         ; push 80 onto stack PORT (reverse byte order)
+                                    push    word 2              ; push 2 dec onto stack AF_INET
+                                    mov     ecx, esp            ; move address of stack pointer into ecx
+                                    push    byte 16             ; push 16 dec onto stack (arguments length)
+                                    push    ecx                 ; push the address of arguments onto stack
+                                    push    edi                 ; push the file descriptor onto stack
+                                    mov     ecx, esp            ; move address of arguments into ecx
+                                    mov     ebx, 3              ; invoke subroutine CONNECT (3)
+                                    mov     eax, 102            ; invoke SYS_SOCKETCALL (kernel opcode 102)
+                                    int     80h                 ; call the kernel
+
+                                _write:
+
+                                    mov     edx, 43             ; move 43 dec into edx (length in bytes to write)
+                                    mov     ecx, request        ; move address of our request variable into ecx
+                                    mov     ebx, edi            ; move file descriptor into ebx (created socket file descriptor)
+                                    mov     eax, 4              ; invoke SYS_WRITE (kernel opcode 4)
+                                    int     80h                 ; call the kernel
+
+                                _read:
+
+                                    mov     edx, 1              ; number of bytes to read (we will read 1 byte at a time)
+                                    mov     ecx, buffer         ; move the memory address of our buffer variable into ecx
+                                    mov     ebx, edi            ; move edi into ebx (created socket file descriptor)
+                                    mov     eax, 3              ; invoke SYS_READ (kernel opcode 3)
+                                    int     80h                 ; call the kernel
+
+                                    cmp     eax, 0              ; if return value of SYS_READ in eax is zero, we have reached the end of the file
+                                    jz      _close              ; jmp to _close if we have reached the end of the file (zero flag set)
+
+                                    mov     eax, buffer         ; move the memory address of our buffer variable into eax for printing
+                                    call    sprint              ; call our string printing function
+                                    jmp     _read               ; jmp to _read
+
+                                _close:
+
+                                    mov     ebx, edi            ; move edi into ebx (connected socket file descriptor)
+                                    mov     eax, 6              ; invoke SYS_CLOSE (kernel opcode 6)
+                                    int     80h                 ; call the kernel
+
+                                _exit:
+
+                                    call    quit                ; call our quit function
+                            </pre>
+                            <div class="output">
+                                <div class="inner">
+                                    <span>~$ nasm -f elf crawler.asm</span>
+                                    <span>~$ ld -m elf_i386 crawler.o -o crawler</span>
+                                    <span>~$ ./crawler</span>
+                                    <span>HTTP/1.1 200 OK</span>
+                                    <span>Content-Type: text/html</span>
+                                    <span>&nbsp;</span>
+                                    <span>&lt;!DOCTYPE html&gt;</span>
+                                    <span>&lt;html lang="en"&gt;</span>
+                                    <span>...</span>
+                                    <span>&lt;/html&gt;</span>
+                                </div>
+                            </div>
+                        </div>
                     </article>
                 </div>
 
