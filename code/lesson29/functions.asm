@@ -26,8 +26,12 @@ atoi:
     jmp     .multiplyLoop   ; continue multiply loop
 
 .finished:
+    cmp     ecx, 0          ; compare ecx register's value against decimal 0 (our counter register)
+    je      .restore        ; jump if equal to 0 (no integer arguments were passed to atoi)
     mov     ebx, 10         ; move decimal value 10 into ebx
     div     ebx             ; divide eax by value in ebx (in this case 10)
+
+.restore:
     pop     esi             ; restore esi from the value we pushed onto the stack at the start
     pop     edx             ; restore edx from the value we pushed onto the stack at the start
     pop     ecx             ; restore ecx from the value we pushed onto the stack at the start
