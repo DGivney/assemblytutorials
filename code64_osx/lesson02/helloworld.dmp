@@ -1,0 +1,61 @@
+
+helloworld:	file format Mach-O 64-bit x86-64
+
+
+Disassembly of section __TEXT,__text:
+
+0000000100000f93 _main:
+100000f93: b8 04 00 00 02              	mov	eax, 33554436
+100000f98: bf 01 00 00 00              	mov	edi, 1
+100000f9d: 48 be 00 10 00 00 01 00 00 00       	movabs	rsi, 4294971392
+100000fa7: ba 0d 00 00 00              	mov	edx, 13
+100000fac: 0f 05                       	syscall
+100000fae: b8 01 00 00 02              	mov	eax, 33554433
+100000fb3: 48 31 ff                    	xor	rdi, rdi
+100000fb6: 0f 05                       	syscall
+
+Disassembly of section __TEXT,__unwind_info:
+
+0000000100000fb8 __unwind_info:
+100000fb8: 01 00                       	add	dword ptr [rax], eax
+100000fba: 00 00                       	add	byte ptr [rax], al
+100000fbc: 1c 00                       	sbb	al, 0
+100000fbe: 00 00                       	add	byte ptr [rax], al
+100000fc0: 00 00                       	add	byte ptr [rax], al
+100000fc2: 00 00                       	add	byte ptr [rax], al
+100000fc4: 1c 00                       	sbb	al, 0
+100000fc6: 00 00                       	add	byte ptr [rax], al
+100000fc8: 00 00                       	add	byte ptr [rax], al
+100000fca: 00 00                       	add	byte ptr [rax], al
+100000fcc: 1c 00                       	sbb	al, 0
+100000fce: 00 00                       	add	byte ptr [rax], al
+100000fd0: 02 00                       	add	al, byte ptr [rax]
+100000fd2: 00 00                       	add	byte ptr [rax], al
+100000fd4: 93                          	xchg	eax, ebx
+100000fd5: 0f 00 00                    	sldt	word ptr [rax]
+100000fd8: 34 00                       	xor	al, 0
+100000fda: 00 00                       	add	byte ptr [rax], al
+100000fdc: 34 00                       	xor	al, 0
+100000fde: 00 00                       	add	byte ptr [rax], al
+100000fe0: b9 0f 00 00 00              	mov	ecx, 15
+100000fe5: 00 00                       	add	byte ptr [rax], al
+100000fe7: 00 34 00                    	add	byte ptr [rax + rax], dh
+100000fea: 00 00                       	add	byte ptr [rax], al
+100000fec: 03 00                       	add	eax, dword ptr [rax]
+100000fee: 00 00                       	add	byte ptr [rax], al
+100000ff0: 0c 00                       	or	al, 0
+100000ff2: 01 00                       	add	dword ptr [rax], eax
+100000ff4: 10 00                       	adc	byte ptr [rax], al
+100000ff6: 01 00                       	add	dword ptr [rax], eax
+		...
+
+Disassembly of section __DATA,__data:
+
+0000000100001000 msg:
+100001000: 48 65                       	gs
+100001002: 6c                          	insb	byte ptr es:[rdi], dx
+100001003: 6c                          	insb	byte ptr es:[rdi], dx
+100001004: 6f                          	outsd	dx, dword ptr [rsi]
+100001005: 20 57 6f                    	and	byte ptr [rdi + 111], dl
+100001008: 72 6c                       	jb	108 <msg+0x76>
+10000100a: 64 21 0a                    	and	dword ptr fs:[rdx], ecx
