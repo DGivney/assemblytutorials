@@ -1,4 +1,4 @@
-FILE1 = helloworld-inc
+FILE1 = helloworld-input
 
 build: clean compile link
 

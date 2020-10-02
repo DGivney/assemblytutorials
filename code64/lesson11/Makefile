@@ -1,4 +1,4 @@
-FILE1 = helloworld-inc
+FILE1 = helloworld-10
 
 build: clean compile link
 
