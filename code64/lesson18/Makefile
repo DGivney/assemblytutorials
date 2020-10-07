@@ -1,4 +1,4 @@
-FILE1 = namespace
+FILE1 = fizzbuzz
 
 build: clean compile link
 
