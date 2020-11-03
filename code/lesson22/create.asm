@@ -13,7 +13,7 @@ global  _start
 
 _start:
 
-    mov     ecx, 0777           ; set all permissions to read, write, execute
+    mov     ecx, 0777o          ; set all permissions to read, write, execute
     mov     ebx, filename       ; filename we will create
     mov     eax, 8              ; invoke SYS_CREAT (kernel opcode 8)
     int     80h                 ; call the kernel
