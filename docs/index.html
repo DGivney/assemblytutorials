@@ -2213,7 +2213,7 @@
 
                                 _start:
 
-                                    mov     ecx, 0777           ; set all permissions to read, write, execute
+                                    mov     ecx, 0777o          ; set all permissions to read, write, execute
                                     mov     ebx, filename       ; filename we will create
                                     mov     eax, 8              ; invoke SYS_CREAT (kernel opcode 8)
                                     int     80h                 ; call the kernel
@@ -2269,7 +2269,7 @@
 
                                 _start:
 
-                                    mov     ecx, 0777           ; code continues from lesson 22
+                                    mov     ecx, 0777o          ; code continues from lesson 22
                                     mov     ebx, filename
                                     mov     eax, 8
                                     int     80h
@@ -2369,7 +2369,7 @@
 
                                 _start:
 
-                                    mov     ecx, 0777           ; Create file from lesson 22
+                                    mov     ecx, 0777o          ; Create file from lesson 22
                                     mov     ebx, filename
                                     mov     eax, 8
                                     int     80h
@@ -2441,7 +2441,7 @@
 
                                 _start:
 
-                                    mov     ecx, 0777           ; Create file from lesson 22
+                                    mov     ecx, 0777o          ; Create file from lesson 22
                                     mov     ebx, filename
                                     mov     eax, 8
                                     int     80h
@@ -2516,7 +2516,7 @@
 
                                 _start:
 
-                                    mov     ecx, 0777           ; Create file from lesson 22
+                                    mov     ecx, 0777o          ; Create file from lesson 22
                                     mov     ebx, filename
                                     mov     eax, 8
                                     int     80h
