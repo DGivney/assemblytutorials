@@ -14,7 +14,7 @@ global  _start
 
 _start:
 
-    mov     ecx, 0777           ; code continues from lesson 22
+    mov     ecx, 0777o          ; code continues from lesson 22
     mov     ebx, filename
     mov     eax, 8
     int     80h
