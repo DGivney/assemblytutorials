@@ -1890,7 +1890,7 @@
                             nextNumber:
                                 inc     ecx             ; increment our counter variable
 
-                            .checkFizz
+                            .checkFizz:
                                 mov     edx, 0          ; clear the edx register - this will hold our remainder after division
                                 mov     eax, ecx        ; move the value of our counter into eax for division
                                 mov     ebx, 3          ; move our number to divide by into ebx (in this case the value is 3)
