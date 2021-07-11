@@ -1773,6 +1773,11 @@
 
                         <p>Local labels are prepended with a "." at the beginning of their name for example ".finished". You may have noticed them appearing as our code base in functions.asm grew.  A local label is given the namespace of the first global label above it. You can jump to a local label by using the JMP instruction and the compiler will calculate which local label you are referencing by determining in what scope (based on the above global labels) the instruction was called.</p>
 
+                        <p>
+                            <span class="label label-info">Note:</span>
+                            The file functions.asm was modified adding namespaces in all the subroutines, especially in the "slen" subroutine which contains a "finished" global label.
+                        </p>
+
                         <div class="snippet">
                             <span class="filename">namespace.asm</span>
                             <pre class="brush: asm;">
