@@ -6,7 +6,7 @@
 %include    'functions.asm'
 
 SECTION .data
-filename db 'readme.txt',       ; the filename to create
+filename db 'readme.txt', 0h    ; the filename to create
 
 SECTION .text
 global  _start
