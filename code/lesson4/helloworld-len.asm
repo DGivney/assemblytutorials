@@ -4,7 +4,7 @@
 ; Run with: ./helloworld-len
 
 SECTION .data
-msg     db      'Hello, brave new world!', 0AH
+msg     db      'Hello, brave new world!', 0AH, 0h
 
 SECTION .text
 global  _start
