@@ -22,7 +22,7 @@ _start:
 
 	mov     edx, 255        ; number of bytes to read
 	mov     ecx, sinput     ; reserved space to store our input (known as a buffer)
-	mov     ebx, 0          ; write to the STDIN file
+	mov     ebx, 0          ; read from the STDIN file
 	mov     eax, 3          ; invoke SYS_READ (kernel opcode 3)
     int     80h
 
