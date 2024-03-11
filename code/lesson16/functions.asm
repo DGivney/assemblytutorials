@@ -19,7 +19,7 @@ atoi:
     jg      .finished       ; jump if greater than to label finished
 
     sub     bl, 48          ; convert ebx register's lower half to decimal representation of ascii value
-    add     eax, ebx        ; add ebx to our interger value in eax
+    add     eax, ebx        ; add ebx to our integer value in eax
     mov     ebx, 10         ; move decimal value 10 into ebx
     mul     ebx             ; multiply eax by ebx to get place value
     inc     ecx             ; increment ecx (our counter register)
