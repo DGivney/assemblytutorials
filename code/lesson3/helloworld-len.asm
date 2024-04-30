@@ -18,7 +18,7 @@ nextchar:
     cmp     byte [eax], 0   ; compare the byte pointed to by EAX at this address against zero (Zero is an end of string delimiter)
     jz      finished        ; jump (if the zero flagged has been set) to the point in the code labeled 'finished'
     inc     eax             ; increment the address in EAX by one byte (if the zero flagged has NOT been set)
-    jmp     nextchar        ; jump to the point in the code labeled 'loop'
+    jmp     nextchar        ; jump to the point in the code labeled 'nextchar'
     
 finished:
     sub     eax, ebx        ; subtract the address in EBX from the address in EAX
