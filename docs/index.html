@@ -930,7 +930,11 @@
 
                                 push    eax         ; push eax onto the stack to preserve it while we use the eax register in this function
                                 mov     eax, 0Ah    ; move 0Ah into eax - 0Ah is the ascii character for a linefeed
+                                                    ; as eax is 4 bytes wide, it now contains 0000000Ah
                                 push    eax         ; push the linefeed onto the stack so we can get the address
+                                                    ; given that we have a little-endian architecture, eax register bytes are stored in reverse order,
+                                                    ; this corresponds to stack memory contents of 0Ah, 0h, 0h, 0h,
+                                                    ; giving us a linefeed followed by a NULL terminating byte
                                 mov     eax, esp    ; move the address of the current stack pointer into eax for sprint
                                 call    sprint      ; call our sprint function
                                 pop     eax         ; remove our linefeed character from the stack
