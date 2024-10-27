@@ -368,7 +368,7 @@
 
                             <p>We can accomplish this all in assembly by loading EAX with the function number (operation code OPCODE) we want to execute and filling the remaining registers with the arguments we want to pass to the system call. A software interrupt is requested with the INT instruction and the kernel takes over and calls the function from the library with our arguments. Simple.</p>
 
-                            <p>For example requesting an interrupt when EAX=1 will call sys_exit and requesting an interrupt when EAX=4 will call sys_write instead. EBX, ECX & EDX will be passed as arguments if the function requires them. <a href="https://chromium.googlesource.com/chromiumos/docs/+/HEAD/constants/syscalls.md#x86-32_bit" target="_blank">Click here to view an example of a Linux System Call Table and its corresponding OPCODES.</a></p>
+                            <p>For example requesting an interrupt when EAX=1 will call sys_exit and requesting an interrupt when EAX=4 will call sys_write instead. EBX, ECX & EDX will be passed as arguments if the function requires them. <a href="https://www.chromium.org/chromium-os/developer-library/reference/linux-constants/syscalls/#x86_64-64-bit" target="_blank">Click here to view an example of a Linux System Call Table and its corresponding OPCODES.</a></p>
 
                             <h5>Writing our program</h5>
 
